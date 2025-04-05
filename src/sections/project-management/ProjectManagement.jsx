@@ -256,7 +256,10 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
         }
         if (col.field.startsWith('statements.')) {
           const statementKey = col.field.split('.')[1];
-          return item.statements[statementKey] !== null ? item.statements[statementKey] : '-';
+          const value = item.statements[statementKey];
+          // 处理0值和null值
+          if (value === 0) return '0';
+          return value !== null && value !== undefined ? value : '-';
         }
         // 跳过 actions 列
         if (col.field === 'actions') return null;
