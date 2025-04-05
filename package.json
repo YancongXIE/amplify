@@ -21,6 +21,7 @@
     "@upsetjs/react": "^1.11.0",
     "@use-gesture/react": "^10.3.1",
     "ag-charts-react": "^10.1.0",
+    "aws-amplify": "^6.14.1",
     "axios": "^1.8.4",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
@@ -49,12 +50,18 @@
     "svd-js": "^1.1.1"
   },
   "devDependencies": {
+    "@aws-amplify/backend": "^1.14.3",
+    "@aws-amplify/backend-cli": "^1.5.0",
     "@eslint/js": "^9.11.1",
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "aws-cdk": "^2.1003.0",
+    "aws-cdk-lib": "^2.180.0",
+    "constructs": "^10.4.2",
     "daisyui": "^4.12.13",
+    "esbuild": "^0.25.2",
     "eslint": "^9.11.1",
     "eslint-plugin-react": "^7.37.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
@@ -62,6 +69,8 @@
     "globals": "^15.9.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3",
     "vite": "^6.2.5"
   }
 }
