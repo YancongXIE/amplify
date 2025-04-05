@@ -1,68 +1,129 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.watermark {
+  position: absolute;
+  bottom: 0px;
+  right: 4em;
+  width: 100px;
+  opacity: 0.4;
+  pointer-events: none; 
+  z-index: 10; 
+  white-space: nowrap;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+.modal-box {
+  height: auto;
+  overflow-y: visible;
+  border: 0;
+  box-shadow: none;
+  position: relative;
+  max-height: 100%;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
+.box-drop-shadow {
   border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  border-width: 1px !important;
+  border-style: solid;
+  border-color: rgba(1, 1, 1, 0.1);
+  padding: 5px;
+  box-shadow: 10px 10px 5px rgba(1, 1, 1, 0.1);
+  margin-bottom: 20px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.markdown-content {
+  padding: 1.0em;
+}
+
+.markdown-content h1 {
+  margin-top: 1em;
+  font-size: 1.6em;
+  font-weight: 600;
+}
+
+.markdown-content h2 {
+  margin-top: 1em;
+  font-size: 1.4em;
+  font-weight: 600;
+}
+
+.markdown-content h3 {
+  margin-top: 1em;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.markdown-content h4 {
+  margin-top: 1em;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.markdown-content p {
+  margin-top: 1em;
+  font-size: 1em;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.markdown-content ul {
+  padding-left: 20px;
+}
+
+.markdown-content li {
+  margin-top: 1em;
+  margin-bottom: 5px;
+}
+
+.horizontal-text {
+  font-size: .8em;
+  color: lightgray;
+  position: absolute;
+  top: -0.6em;
+  left: -0.2em;
+  padding: 2px;
+  border-radius: 5px;
+  font-style: italic;
+  pointer-events: none;
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-size: .8em;
+  color: lightGray;
+  position: absolute;
+  left: -0.5em;
+  padding: 1px;
+  letter-spacing: -3px;
+  font-style: italic;
+  border-radius: 5px;
+  pointer-events: none;
+}
+
+.dateScroller {
+  width: 100%;
+  min-height: 50px;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-left: 0px;
+  margin-bottom: 1em;
+  padding: 0;
+  /*border: 1px solid lightgreen;*/
+  touch-action: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.dateScrollerCursor {
+  position: absolute;
+  pointer-events: none;
+}
+
+.grab-cursor {
+  cursor: grab; 
+}
+.grab-cursor:active {
+  cursor: grabbing; 
 }
