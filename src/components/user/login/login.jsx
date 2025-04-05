@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import InputField from "../InputField";
+import InputField from "../../user/InputField";
 import { ButtonMediumFullWide } from "../../ui/Buttons";
 import LoadingSpinner from "../../ui/LoadingSpinner";
 import {

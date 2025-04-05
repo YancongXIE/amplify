@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Login from "./login/Login";
+import Login from "./login/login";
 import Register from "./register/Register";
 
 const AuthModal = ({ setIsLoggedIn }) => {
