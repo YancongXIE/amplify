@@ -1,12 +1,61 @@
-# React + Vite
+## Project Description
+This is a React-based web application that support the Claros research project. Key features include:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- User authentication and authorization
+- Project management
+- User management
+- Q-sort ranking
+- Data analysis through upSet
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech Stack
+- React
+- Material-UI
+- React Router
+- Axios
+- Tailwind CSS
 
-## Expanding the ESLint configuration
+## Installation Steps
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Ensure Node.js is installed (recommended version 14.0.0 or higher)
+2. Clone the project locally
+```bash
+git clone [project-url]
+cd notesapp
+```
+
+3. Install dependencies
+```bash
+npm install
+```
+
+## Running Instructions
+
+1. Start development server
+```bash
+npm start
+```
+
+2. Build production version
+```bash
+npm run build
+```
+
+3. Run tests
+```bash
+npm test
+```
+
+```
+notesapp/
+├── src/
+│   ├── components/     # Reusable components
+│   ├── pages/         # Page components
+│   ├── sections/      # Feature modules
+│   ├── api/          # API calls
+│   ├── hooks/        # Custom Hooks
+│   ├── utils/        # Utility functions
+│   └── App.jsx       # Application entry
+├── public/           # Static resources
+└── package.json      # Project configuration
+```
