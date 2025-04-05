@@ -136,8 +136,7 @@ function Register({ toggle }) {
         onChange={passwordChangeHandler}
         onBlur={passwordMarkAsTouched}
         hasError={passwordHasError}
-        errorMessage="Password must be more than 8 characters long, include an
-                  uppercase letter, a number, and a special character."
+        errorMessage="Password must be more than 8 characters long, include an uppercase letter, a number, and a special character."
       />
 
       {/* Register button */}

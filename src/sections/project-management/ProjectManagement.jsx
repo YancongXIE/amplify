@@ -34,14 +34,14 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import DownloadIcon from '@mui/icons-material/Download';
 import { kAPI_URL } from '../../api/utils/constants';
 
-// 表格组件
+// Table component
 const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, clientUsers = null, currentTab, statementData, showBulkAddModal, setShowBulkAddModal, respondentData }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({});
   const [selectedStudy, setSelectedStudy] = useState('');
 
-  // 生成推荐密码
+  // Generate recommended password
   const generateRecommendedPassword = () => {
     const length = 12;
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
@@ -53,7 +53,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
     return password;
   };
 
-  // 根据选中的研究过滤数据
+  // Filter data based on selected study
   const filteredData = selectedStudy && (currentTab === 3 || currentTab === 4 || currentTab === 5)
     ? data.filter(item => parseInt(item.studyID) === parseInt(selectedStudy))
     : data;
@@ -697,7 +697,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
   );
 };
 
-// 主组件
+// Main component
 export default function ProjectManagement() {
   const [currentTab, setCurrentTab] = useState(0);
   const [distributionData, setDistributionData] = useState([]);
@@ -721,7 +721,7 @@ export default function ProjectManagement() {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  // 获取数据的函数
+  // Get data function
   const fetchData = async (endpoint) => {
     try {
       const response = await fetch(`${kAPI_URL}/api/${endpoint}`, {
@@ -737,7 +737,7 @@ export default function ProjectManagement() {
     }
   };
 
-  // 获取 admin 用户数据
+  // Get admin user data
   const fetchClientUsers = async () => {
     try {
       const response = await fetch(`${kAPI_URL}/users/clients`, {
@@ -757,7 +757,7 @@ export default function ProjectManagement() {
     }
   };
 
-  // 加载所有数据
+  // Load all data
   useEffect(() => {
     const loadData = async () => {
       const [
@@ -786,14 +786,14 @@ export default function ProjectManagement() {
       setStudyStatementData(studyStatement);
       setQSortData(qsort);
       
-      // 获取 admin 用户数据
+      // Get admin user data
       await fetchClientUsers();
     };
 
     loadData();
   }, []);
 
-  // 表格列定义
+  // Table column definition
   const columns = {
     distribution: [
       { field: 'distributionID', label: 'ID' },
@@ -873,7 +873,7 @@ export default function ProjectManagement() {
     ]
   };
 
-  // 处理编辑、删除和添加的函数
+  // Handle edit, delete and add functions
   const handleDelete = async (table, item) => {
     try {
       const headers = {
@@ -888,7 +888,7 @@ export default function ProjectManagement() {
       const responseData = await response.json();
 
       if (!responseData.Error) {
-        // 刷新数据
+        // Refresh data
         const updatedData = await fetchData(table);
         switch (table) {
           case 'distribution':
@@ -938,12 +938,12 @@ export default function ProjectManagement() {
     if (!table || !newData) return;
 
     try {
-      // 从 newData 中移除 adminID 字段
+      // Remove adminID from newData
       const { adminID, ...dataToUpdate } = newData || {};
       
-      // 如果是 Q-Sort 数据，需要特殊处理
+      // If Q-Sort data, special handling needed
       if (table === 'qsort') {
-        // 找到对应的 studyStatementID
+        // Find corresponding studyStatementID
         const studyStatement = studyStatementData.find(s => 
           s.statementID === dataToUpdate.statementID
         );
@@ -952,7 +952,7 @@ export default function ProjectManagement() {
           throw new Error('Invalid statement selection');
         }
 
-        // 更新数据
+        // Update data
         dataToUpdate.studyStatementID = studyStatement.studyStatementID;
         dataToUpdate.respondentID = dataToUpdate.respondentID;
         dataToUpdate.qSortValue = dataToUpdate.qSortValue;
@@ -968,7 +968,7 @@ export default function ProjectManagement() {
       });
 
       if (response.ok) {
-        // 刷新数据
+        // Refresh data
         const updatedData = await fetchData(table);
         switch (table) {
           case 'distribution':
@@ -1087,7 +1087,7 @@ export default function ProjectManagement() {
           });
           break;
         case 'studyStatement':
-          // 确保 studyID 和 statementID 都是数字
+          // Ensure studyID and statementID are numbers
           const studyID = parseInt(newData.studyID);
           const statementID = parseInt(newData.statementID);
           
@@ -1108,7 +1108,7 @@ export default function ProjectManagement() {
           });
           break;
         case 'qsort':
-          // 找到对应的 studyStatementID
+          // Find corresponding studyStatementID
           const studyStatement = studyStatementData.find(s => 
             s.statementID === newData.statementID
           );
@@ -1135,7 +1135,7 @@ export default function ProjectManagement() {
       const responseData = await response.json();
 
       if (response.ok) {
-        // 刷新数据
+        // Refresh data
         const updatedData = await fetchData(tablename);
         
         switch (tablename) {
@@ -1182,7 +1182,7 @@ export default function ProjectManagement() {
     }
   };
 
-  // 添加批量添加处理函数
+  // Add batch add processing function
   const handleBulkAdd = async () => {
     if (!selectedStudy) {
       setSnackbar({
@@ -1199,7 +1199,7 @@ export default function ProjectManagement() {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       };
 
-      // 生成批量添加的数据
+      // Generate batch add data
       const respondents = Array.from({ length: bulkCount }, (_, index) => {
         const timestamp = new Date().getTime();
         return {
@@ -1218,7 +1218,7 @@ export default function ProjectManagement() {
       const responseData = await response.json();
 
       if (response.ok) {
-        // 刷新数据
+        // Refresh data
         const updatedData = await fetchData('respondent');
         setRespondentData(updatedData);
         setShowBulkAddModal(false);
@@ -1245,12 +1245,12 @@ export default function ProjectManagement() {
     }
   };
 
-  // 在 ProjectManagement 组件中添加新的数据处理函数
+  // Add new data processing function in ProjectManagement component
   const processQSortData = () => {
-    // 获取所有唯一的受访者
+    // Get all unique respondents
     const uniqueRespondents = [...new Set(qSortData.map(item => item.respondentID))];
     
-    // 获取所有唯一的语句
+    // Get all unique statements
     const uniqueStatements = [...new Set(qSortData.map(item => {
       const studyStatement = studyStatementData.find(s => s.studyStatementID === item.studyStatementID);
       if (studyStatement) {
@@ -1260,7 +1260,7 @@ export default function ProjectManagement() {
       return null;
     }))].filter(Boolean);
 
-    // 创建新的数据结构
+    // Create new data structure
     return uniqueRespondents.map(respondentId => {
       const respondent = respondentData.find(r => r.respondentID === respondentId);
       const rowData = {
@@ -1269,7 +1269,7 @@ export default function ProjectManagement() {
         statements: {}
       };
 
-      // 为每个语句添加 Q-Sort 值
+      // Add Q-Sort value for each statement
       uniqueStatements.forEach(statementId => {
         const studyStatement = studyStatementData.find(s => s.statementID === statementId);
         if (studyStatement) {
@@ -1428,20 +1428,20 @@ export default function ProjectManagement() {
                     <Box>
                       <IconButton 
                         onClick={() => {
-                          // 找到该受访者的所有 Q-Sort 数据
+                          // Find all Q-Sort data for this respondent
                           const qSortItems = qSortData.filter(q => q.respondentID === item.respondentID);
                           
-                          // 记录日志
+                          // Log
                           console.log('Q-Sort data to be deleted:', {
                             respondentID: item.respondentID,
                             username: item.username,
                             qSortItems: qSortItems
                           });
 
-                          // 删除所有相关的 Q-Sort 数据
+                          // Delete all related Q-Sort data
                           qSortItems.forEach(qSortItem => {
                             console.log('Deleting Q-Sort data:', qSortItem);
-                            // 发送删除请求
+                            // Send delete request
                             fetch(`${kAPI_URL}/api/qsort/${qSortItem.respondentID}`, {
                               method: 'DELETE',
                               headers: {
@@ -1470,7 +1470,7 @@ export default function ProjectManagement() {
                                 });
                               } else {
                                 console.log('Delete successful:', data.Message);
-                                // 刷新数据
+                                // Refresh data
                                 fetchData('qsort').then(data => setQSortData(data));
                                 setSnackbar({
                                   open: true,
@@ -1540,7 +1540,7 @@ export default function ProjectManagement() {
         </Alert>
       </Snackbar>
 
-      {/* 添加批量添加对话框 */}
+      {/* Add batch add dialog */}
       <Dialog 
         open={showBulkAddModal} 
         onClose={() => setShowBulkAddModal(false)}

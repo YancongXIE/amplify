@@ -12,7 +12,7 @@ import { kAPI_URL } from '../../../api/utils/constants';
 
 const Login = ({ toggle }) => {
   const [userType, setUserType] = useState("respondent");
-  const [username, setUsername] = useState(""); // 新增：用户名状态
+  const [username, setUsername] = useState(""); // New: username state
   const {
     value: emailValue,
     hasError: emailHasError,
@@ -89,11 +89,11 @@ const Login = ({ toggle }) => {
       }
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("userType", userType); // 存储用户类型
+      localStorage.setItem("userType", userType); // Store user type
       setIsLoggedIn(true);
       await fetchUserData();
       setError(null);
-      setUsername(""); // 重置用户名
+      setUsername(""); // Reset username
       emailInputReset();
       passwordInputReset();
       setSuccess("Login successful!");
@@ -116,7 +116,7 @@ const Login = ({ toggle }) => {
     <div className="flex flex-col">
       <h2 className="card-title">Login</h2>
       
-      {/* 用户类型选择器 */}
+      {/* User type selector */}
       <div className="form-control mb-4">
         <label className="label">
           <span className="label-text">Login as</span>
@@ -145,7 +145,7 @@ const Login = ({ toggle }) => {
         </div>
       </div>
 
-      {/* 根据用户类型显示不同的输入字段 */}
+      {/* Show different input fields based on user type */}
       {userType === "admin" ? (
         <InputField
           label="Email"

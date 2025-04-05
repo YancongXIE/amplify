@@ -47,7 +47,7 @@ const UserManagement = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
-  // 检查用户角色
+  // Check user role
   const checkUserRole = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -70,7 +70,7 @@ const UserManagement = () => {
       console.log('User profile data:', data);
       setUserRole(data.user.role);
       
-      // 如果不是 manager，重定向到首页
+      // If not manager, redirect to home page
       if (data.user.role !== 'manager') {
         navigate('/');
       }
@@ -158,7 +158,7 @@ const UserManagement = () => {
     }
   };
 
-  // 添加重置表单的函数
+  // Add form reset function
   const resetAddUserForm = () => {
     setNewUser({
       firstName: '',
@@ -169,25 +169,25 @@ const UserManagement = () => {
     });
   };
 
-  // 修改打开模态框的处理函数
+  // Modify modal open handler
   const handleOpenAddUserModal = () => {
     resetAddUserForm();
     setIsAddUserOpen(true);
   };
 
-  // 修改关闭模态框的处理函数
+  // Modify modal close handler
   const handleCloseAddUserModal = () => {
     setIsAddUserOpen(false);
     resetAddUserForm();
   };
 
-  // 修改修改密码的处理函数
+  // Modify password change handler
   const handleChangePassword = async (e) => {
     e.preventDefault();
     try {
       setPasswordError('');
       
-      // 验证密码
+      // Validate password
       if (newPassword !== confirmPassword) {
         setPasswordError('Passwords do not match');
         return;
@@ -218,14 +218,14 @@ const UserManagement = () => {
         throw new Error(data.message || 'Failed to change password');
       }
 
-      // 关闭模态框并重置状态
+      // Close modal and reset state
       setIsChangePasswordModalOpen(false);
       setNewPassword('');
       setConfirmPassword('');
       setSelectedUserForPassword(null);
       setSuggestedPassword('');
       
-      // 显示成功消息
+      // Show success message
       toast.success(
         `Password successfully changed for ${selectedUserForPassword.firstName} ${selectedUserForPassword.lastName}`,
         {
@@ -258,7 +258,7 @@ const UserManagement = () => {
     }
   };
 
-  // 修改生成密码建议函数
+  // Modify generate password suggestion function
   const generatePassword = () => {
     const length = 12;
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
@@ -276,7 +276,7 @@ const UserManagement = () => {
     }
   };
 
-  // 复制密码到剪贴板
+  // Copy password to clipboard
   const copyToClipboard = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -292,7 +292,7 @@ const UserManagement = () => {
       });
     } catch (err) {
       console.error('Failed to copy:', err);
-      // 如果 navigator.clipboard 不可用，尝试使用传统方法
+      // If navigator.clipboard is not available, try using traditional method
       try {
         const textArea = document.createElement('textarea');
         textArea.value = text;
@@ -326,7 +326,7 @@ const UserManagement = () => {
     }
   };
 
-  // 修改添加用户的处理函数
+  // Modify add user handler
   const handleAddUser = async (e) => {
     e.preventDefault();
     try {
@@ -337,19 +337,19 @@ const UserManagement = () => {
         throw new Error('No authentication token found');
       }
 
-      // 确保所有必需字段都已填写
+      // Ensure all required fields are filled
       if (!newUser.firstName || !newUser.lastName || !newUser.email || !newUser.password) {
         throw new Error('Please fill in all required fields');
       }
 
-      // 验证邮箱格式
+      // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(newUser.email)) {
         setEmailError('Please enter a valid email address');
         return;
       }
 
-      // 构造要发送的用户数据
+      // Construct user data to send
       const userData = {
         firstName: newUser.firstName,
         lastName: newUser.lastName,
@@ -386,7 +386,7 @@ const UserManagement = () => {
       const data = await response.json();
       console.log('User added successfully:', data);
       
-      // 显示成功信息和用户凭据
+      // Show success message and user credentials
       toast.success('User added successfully', {
         duration: 5000,
         position: 'top-center',
@@ -396,18 +396,18 @@ const UserManagement = () => {
         },
       });
 
-      // 显示用户凭据对话框
+      // Show user credentials dialog
       setNewUserCredentials({
         email: newUser.email,
         password: newUser.password
       });
       setShowCredentialsModal(true);
       
-      // 重置表单并关闭添加用户模态框
+      // Reset form and close add user modal
       resetAddUserForm();
       setIsAddUserOpen(false);
       
-      // 重新获取用户列表
+      // Re-fetch user list
       await fetchUsers();
     } catch (error) {
       console.error('Failed to add user:', error);
@@ -422,12 +422,12 @@ const UserManagement = () => {
     (user.lastName && user.lastName.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  // 初始化组件
+  // Initialize component
   useEffect(() => {
     checkUserRole();
   }, []);
 
-  // 当用户角色更新时获取用户列表
+  // Fetch users when user role is updated
   useEffect(() => {
     if (userRole === 'manager') {
       fetchUsers();
@@ -761,7 +761,7 @@ const UserManagement = () => {
           </Dialog>
         </Transition>
 
-        {/* 添加用户凭据显示模态框 */}
+        {/* Add user credentials display modal */}
         <Transition appear show={showCredentialsModal} as={Fragment}>
           <Dialog as="div" className="relative z-10" onClose={() => setShowCredentialsModal(false)}>
             <Transition.Child
@@ -851,7 +851,7 @@ const UserManagement = () => {
           </Dialog>
         </Transition>
 
-        {/* 修改密码模态框 */}
+        {/* Change password modal */}
         <Transition appear show={isChangePasswordModalOpen} as={Fragment}>
           <Dialog as="div" className="relative z-10" onClose={() => setIsChangePasswordModalOpen(false)}>
             <Transition.Child
