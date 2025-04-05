@@ -6,7 +6,7 @@ by Matthew Campbell
 import { useRef, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import useClickOutside from "../../hooks/useClickOutside";
-import DarkmodeToggler from "../ui/DarkModeToggler";
+import DarkmodeToggler from "../ui/DarkmodeToggler";
 import Icons from "./DashboardIcons";
 import { AuthContext } from "../../context/AuthProvider";
 import LoadingSpinner from "../ui/LoadingSpinner";
