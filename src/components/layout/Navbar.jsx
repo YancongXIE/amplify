@@ -3,9 +3,25 @@ import { AuthContext } from "../../context/AuthProvider";
 import { ButtonSmallPrimary } from "../ui/Buttons";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import AuthModal from "../user/AuthModal";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  const { isLoggedIn, handleLogout, loading } = useContext(AuthContext);
+  const { isLoggedIn, handleLogout, loading, user } = useContext(AuthContext);
+
+  // 根据用户角色获取默认页面路径
+  const getDefaultPage = () => {
+    if (!user) return "/";
+    switch (user.role) {
+      case "respondent":
+        return "/ranking-exercise";
+      case "manager":
+        return "/project-management";
+      case "admin":
+        return "/dashboard";
+      default:
+        return "/dataanalyst";
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -55,25 +71,34 @@ export default function Navbar() {
               <a>Menu</a>
               <ul className="p-2 z-50">
                 <li>
-                  <a>About</a>
+                  <Link to="/about" className="text-primary-content">About</Link>
                 </li>
                 <li>
-                  <a>Result</a>
+                  <Link to="/results" className="text-primary-content">Results</Link>
                 </li>
                 <li>
-                  <a>Ranking</a>
+                  <Link to="/ranking" className="text-primary-content">Ranking</Link>
                 </li>
-                <li>
-                  <a>Test</a>
-                </li>
+                {isLoggedIn && (
+                  <li>
+                    <Link to={getDefaultPage()} className="text-primary-content">
+                      Dashboard
+                    </Link>
+                  </li>
+                )}
               </ul>
             </li>
             <li>
-              <a>Contact</a>
+              <Link to="/contact" className="text-primary-content">Contact</Link>
             </li>
           </ul>
         </div>
-        <a className="btn btn-ghost text-xl text-primary-content">Claros</a>
+        <Link 
+          to="/" 
+          className="btn btn-ghost text-xl text-primary-content hover:bg-primary/10 transition-colors duration-200"
+        >
+          Claros
+        </Link>
       </div>
 
       <div className="navbar-center hidden lg:flex">
@@ -83,19 +108,26 @@ export default function Navbar() {
               <summary className="text-primary-content">Menu</summary>
               <ul className="p-2 z-50">
                 <li>
-                  <a>About</a>
+                  <Link to="/about" className="text-primary-content">About</Link>
                 </li>
                 <li>
-                  <a>Result</a>
+                  <Link to="/results" className="text-primary-content">Results</Link>
                 </li>
                 <li>
-                  <a>Ranking</a>
+                  <Link to="/ranking" className="text-primary-content">Ranking</Link>
                 </li>
+                {isLoggedIn && (
+                  <li>
+                    <Link to={getDefaultPage()} className="text-primary-content">
+                      Dashboard
+                    </Link>
+                  </li>
+                )}
               </ul>
             </details>
           </li>
           <li>
-            <a className="text-primary-content">Contact</a>
+            <Link to="/contact" className="text-primary-content">Contact</Link>
           </li>
         </ul>
       </div>
@@ -111,9 +143,14 @@ export default function Navbar() {
             Login
           </ButtonSmallPrimary>
         ) : (
-          <ButtonSmallPrimary onClick={handleLogout} disabled={loading}>
-            {loading ? <LoadingSpinner /> : "Logout"}
-          </ButtonSmallPrimary>
+          <div className="flex items-center gap-4">
+            <Link to={getDefaultPage()} className="text-primary-content hover:text-primary">
+              Go to Dashboard
+            </Link>
+            <ButtonSmallPrimary onClick={handleLogout} disabled={loading}>
+              {loading ? <LoadingSpinner /> : "Logout"}
+            </ButtonSmallPrimary>
+          </div>
         )}
       </div>
 
@@ -122,3 +159,4 @@ export default function Navbar() {
     </div>
   );
 }
+

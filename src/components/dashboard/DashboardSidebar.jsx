@@ -8,7 +8,7 @@ import { ThemeContext } from "../../context/ThemeProvider";
 import { AuthContext } from "../../context/AuthProvider";
 import SidebarItem from "./SidebarItem";
 import Icons from "./DashboardIcons";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
 export default function DashboardSidebar({ isCollapsed }) {
   const { darkMode } = useContext(ThemeContext);
@@ -16,9 +16,9 @@ export default function DashboardSidebar({ isCollapsed }) {
   const location = useLocation();
 
   const adminItems = [
-    { href: "/dashboard", label: "Dashboard", icon: <Icons.Home /> },
+    { href: "/dashboard", label: "Upset Demo", icon: <Icons.Home /> },
     { href: "/project-management", label: "Project Management", icon: <Icons.Folder /> },
-    { href: "/dataanalyst", label: "Ranking Application", icon: <Icons.CPUChip/> },
+    { href: "/dataanalyst", label: "Ranking Application Demo", icon: <Icons.CPUChip/> },
     { href: "/guide", label: "Guide", icon: <Icons.InfoIcon /> },
     { href: "/settings", label: "Settings", icon: <Icons.SettingsCog /> },
   ];
@@ -48,13 +48,14 @@ export default function DashboardSidebar({ isCollapsed }) {
       } h-full bg-base-300 transition-all duration-300 border-e-2 border-base-200`}
     >
       <div className="p-5">
-        <div
+        <Link 
+          to="/" 
           className={`text-xl font-bold relative -top-1 ${
             darkMode ? "text-primary-content" : "text-primary"
-          }`}
+          } hover:bg-primary/10 transition-colors duration-200 p-2 rounded-lg`}
         >
           {isCollapsed ? "C" : "Claros"}
-        </div>
+        </Link>
       </div>
 
       <nav className="mt-4" aria-label="Main Navigation">
