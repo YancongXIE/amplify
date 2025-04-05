@@ -15,7 +15,7 @@ This is a React-based web application that support the Claros research project. 
 - Axios
 - Tailwind CSS
 
-## Installation Steps
+## How to use the app
 
 1. Ensure Node.js is installed (recommended version 14.0.0 or higher)
 2. Clone the project locally
@@ -29,21 +29,9 @@ cd notesapp
 npm install
 ```
 
-## Running Instructions
-
-1. Start development server
+4. Run the application
 ```bash
-npm start
-```
-
-2. Build production version
-```bash
-npm run build
-```
-
-3. Run tests
-```bash
-npm test
+npm run dev
 ```
 
 ```
