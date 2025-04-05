@@ -7,6 +7,7 @@ import {
   usePasswordValidator,
   useNameValidator,
 } from "../../../hooks/input-sanitizers/useAuthValidators";
+import { kAPI_URL } from '../../../api/utils/constants';
 
 function Register({ toggle }) {
   const {
@@ -47,14 +48,12 @@ function Register({ toggle }) {
   const [success, setSuccess] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Local area options
-  const localAreaOptions = ["Cairns", "Gold Coast", "Noosa", "Whitsunday"];
 
   // Function to handle registration
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${API_URL}/users/register`, {
+      const response = await fetch(`${kAPI_URL}/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
