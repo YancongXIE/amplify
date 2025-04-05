@@ -9,7 +9,7 @@ import {
 import Html from 'react-pdf-html';
 import LLMResponse from "../layout/LLMResponse";
 import ReactDOMServer from 'react-dom/server';
-import BarChartHome from '../../components/charts/barcharts/BarChartHome';
+import BarChartHome from '../../components/charts/Barcharts/BarChartHome';
 
 const styles = StyleSheet.create({
   page: {
