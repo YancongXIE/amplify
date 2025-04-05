@@ -19,7 +19,7 @@ import AIAnalysis from "./AIAnalysis";
 import LLMResponse from "./LLMResponse";
 import { addDaysToDate, generatePDFFrom } from "../../api/utils/utils";
 import { useWindowWidthResize } from "../../api/hooks/useWindowWidthResize";
-import SpendCats from "../../components/ui/SpendCats.jsx";
+import SpendCats from "../../components/ui/SpendCats";
 import { useLocalisSpendCategories } from "../../api/hooks/useLocalisSpendCategories";
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfig from "../../../tailwind.config.js";
