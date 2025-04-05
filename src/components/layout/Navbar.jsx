@@ -2,7 +2,7 @@ import { useEffect, useContext } from "react";
 import { AuthContext } from "../../context/AuthProvider";
 import { ButtonSmallPrimary } from "../ui/Buttons";
 import LoadingSpinner from "../ui/LoadingSpinner";
-import AuthModal from "../User/AuthModal";
+import AuthModal from "../user/AuthModal";
 
 export default function Navbar() {
   const { isLoggedIn, handleLogout, loading } = useContext(AuthContext);
