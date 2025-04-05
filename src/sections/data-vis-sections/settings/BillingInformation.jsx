@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import InputField from "../../../components/User/InputField";
+import InputField from "../../../components/user/InputField";
 import {
   useNameValidator,
   useEmailValidator,
