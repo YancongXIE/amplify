@@ -25,7 +25,7 @@ export default function DashboardSidebar({ isCollapsed }) {
 
   const managerItems = [
     ...adminItems,
-    { href: "/usermanagement", label: "User Management", icon: <Icons.User /> },
+    { href: "/usermanagement", label: "Admin Management", icon: <Icons.User /> },
   ];
 
   const adminMenuItems = adminItems;

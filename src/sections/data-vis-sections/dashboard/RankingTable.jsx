@@ -49,8 +49,8 @@ export default function RankingTable() {
     if (groupLength !== targetCount) {
       const difference = targetCount - groupLength;
       return difference > 0
-        ? `Increase ${difference} statements`
-        : `Decrease ${Math.abs(difference)} statements`;
+        ? `Too few statements for this rank - should be ${targetCount} statements`
+        : `Too many statements for this rank - should be ${targetCount} statements`;
     }
     return "";
   };
@@ -119,6 +119,14 @@ export default function RankingTable() {
             backgroundColor: "#f8f9fa",
           }}
         >
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <h3 style={{ color: "#2452b5", fontWeight: "bold" }}>
+              Please rank the statements by importance
+            </h3>
+            <p style={{ color: "#666", fontStyle: "italic" }}>
+              Each rank requires a specific number of statements. Please adjust your selections based on the prompts.
+            </p>
+          </div>
           <table className="table table-bordered" style={{ width: "100%", textAlign: "center", borderCollapse: "collapse" }}>
             <tbody>
               {[
