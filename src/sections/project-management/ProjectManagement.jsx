@@ -35,11 +35,10 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { kAPI_URL } from '../../api/utils/constants';
 
 // Table component
-const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, clientUsers = null, currentTab, statementData, showBulkAddModal, setShowBulkAddModal, respondentData }) => {
+const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, clientUsers = null, currentTab, statementData, showBulkAddModal, setShowBulkAddModal, respondentData, selectedStudy, setSelectedStudy }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({});
-  const [selectedStudy, setSelectedStudy] = useState('');
 
   // Generate recommended password
   const generateRecommendedPassword = () => {
@@ -366,7 +365,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
       </Box>
 
       {/* Add study selector */}
-      {(currentTab === 3 || currentTab === 4 || currentTab === 5) && (
+      {(currentTab === 3 || currentTab === 4 || currentTab === 5 || currentTab === 6) && (
         <FormControl fullWidth sx={{ mb: 2 }}>
           <InputLabel>Select Study</InputLabel>
           <Select
@@ -374,7 +373,6 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
             onChange={(e) => setSelectedStudy(e.target.value)}
             label="Select Study"
           >
-            <MenuItem value="">All Studies</MenuItem>
             {parentData.map((study) => (
               <MenuItem key={study.studyID} value={study.studyID}>
                 {study.studyName}
@@ -716,7 +714,7 @@ export default function ProjectManagement() {
   const [clientUsers, setClientUsers] = useState([]);
   const [showBulkAddModal, setShowBulkAddModal] = useState(false);
   const [bulkCount, setBulkCount] = useState(1);
-  const [selectedStudy, setSelectedStudy] = useState('');
+  const [selectedQSortStudy, setSelectedQSortStudy] = useState('');
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -1260,7 +1258,7 @@ export default function ProjectManagement() {
 
   // Add batch add processing function
   const handleBulkAdd = async () => {
-    if (!selectedStudy) {
+    if (!selectedQSortStudy) {
       setSnackbar({
         open: true,
         message: 'Please select a study',
@@ -1281,7 +1279,7 @@ export default function ProjectManagement() {
         return {
           username: `respondent_${timestamp}_${index + 1}`,
           rawPassword: Math.random().toString(36).slice(-8),
-          studyID: parseInt(selectedStudy)
+          studyID: parseInt(selectedQSortStudy)
         };
       });
 
@@ -1299,7 +1297,7 @@ export default function ProjectManagement() {
         setRespondentData(updatedData);
         setShowBulkAddModal(false);
         setBulkCount(1);
-        setSelectedStudy('');
+        setSelectedQSortStudy('');
         setSnackbar({
           open: true,
           message: `Successfully added ${bulkCount} respondents`,
@@ -1323,45 +1321,50 @@ export default function ProjectManagement() {
 
   // Add new data processing function in ProjectManagement component
   const processQSortData = () => {
-    // Get all unique respondents
-    const uniqueRespondents = [...new Set(qSortData.map(item => item.respondentID))];
+    if (!selectedQSortStudy) return [];
+
+    // Get all respondents for the selected study
+    const studyRespondents = respondentData.filter(r => r.studyID === parseInt(selectedQSortStudy));
     
-    // Get all unique statements
-    const uniqueStatements = [...new Set(qSortData.map(item => {
-      const studyStatement = studyStatementData.find(s => s.studyStatementID === item.studyStatementID);
-      if (studyStatement) {
-        const statement = statementData.find(s => s.statementID === studyStatement.statementID);
-        return statement ? statement.statementID : null;
-      }
-      return null;
-    }))].filter(Boolean);
-
-    // Create new data structure
-    return uniqueRespondents.map(respondentId => {
-      const respondent = respondentData.find(r => r.respondentID === respondentId);
-      const rowData = {
-        respondentID: respondentId,
-        username: respondent ? respondent.username : 'Unknown',
-        statements: {}
-      };
-
-      // Add Q-Sort value for each statement
-      uniqueStatements.forEach(statementId => {
-        const studyStatement = studyStatementData.find(s => s.statementID === statementId);
-        if (studyStatement) {
-          const qSortItem = qSortData.find(q => 
-            q.respondentID === respondentId && 
-            q.studyStatementID === studyStatement.studyStatementID
-          );
-          const statement = statementData.find(s => s.statementID === statementId);
-          if (statement) {
-            rowData.statements[statement.short] = qSortItem ? qSortItem.qSortValue : null;
-          }
-        }
+    // Get all statements for the selected study
+    const studyStatements = studyStatementData
+      .filter(s => s.studyID === parseInt(selectedQSortStudy))
+      .map(s => {
+        const statement = statementData.find(st => st.statementID === s.statementID);
+        return {
+          studyStatementID: s.studyStatementID,
+          statementID: s.statementID,
+          short: statement ? statement.short : 'Unknown'
+        };
       });
 
-      return rowData;
-    });
+    // Create new data structure
+    return studyRespondents
+      .filter(respondent => {
+        // Check if respondent has submitted any Q-Sort data
+        const hasSubmittedData = qSortData.some(q => 
+          q.respondentID === respondent.respondentID
+        );
+        return hasSubmittedData;
+      })
+      .map(respondent => {
+        const rowData = {
+          respondentID: respondent.respondentID,
+          username: respondent.username,
+          statements: {}
+        };
+
+        // Add Q-Sort value for each statement
+        studyStatements.forEach(statement => {
+          const qSortItem = qSortData.find(q => 
+            q.respondentID === respondent.respondentID && 
+            q.studyStatementID === statement.studyStatementID
+          );
+          rowData.statements[statement.short] = qSortItem ? qSortItem.qSortValue : null;
+        });
+
+        return rowData;
+      });
   };
 
   return (
@@ -1455,6 +1458,8 @@ export default function ProjectManagement() {
               showBulkAddModal={showBulkAddModal}
               setShowBulkAddModal={setShowBulkAddModal}
               respondentData={respondentData}
+              selectedStudy={selectedQSortStudy}
+              setSelectedStudy={setSelectedQSortStudy}
             />
           )}
           {currentTab === 4 && (
@@ -1507,17 +1512,8 @@ export default function ProjectManagement() {
                           // Find all Q-Sort data for this respondent
                           const qSortItems = qSortData.filter(q => q.respondentID === item.respondentID);
                           
-                          // Log
-                          console.log('Q-Sort data to be deleted:', {
-                            respondentID: item.respondentID,
-                            username: item.username,
-                            qSortItems: qSortItems
-                          });
-
                           // Delete all related Q-Sort data
                           qSortItems.forEach(qSortItem => {
-                            console.log('Deleting Q-Sort data:', qSortItem);
-                            // Send delete request
                             fetch(`${kAPI_URL}/api/qsort/${qSortItem.respondentID}`, {
                               method: 'DELETE',
                               headers: {
@@ -1538,14 +1534,12 @@ export default function ProjectManagement() {
                             })
                             .then(data => {
                               if (data.Error) {
-                                console.error('Delete failed:', data.Message);
                                 setSnackbar({
                                   open: true,
                                   message: data.Message || 'Delete failed',
                                   severity: 'error',
                                 });
                               } else {
-                                console.log('Delete successful:', data.Message);
                                 // Refresh data
                                 fetchData('qsort').then(data => setQSortData(data));
                                 setSnackbar({
@@ -1556,7 +1550,6 @@ export default function ProjectManagement() {
                               }
                             })
                             .catch(error => {
-                              console.error('Delete request failed:', error);
                               setSnackbar({
                                 open: true,
                                 message: 'Delete request failed: ' + error.message,
@@ -1581,6 +1574,9 @@ export default function ProjectManagement() {
               respondentData={respondentData}
               statementData={statementData}
               studyStatementData={studyStatementData}
+              parentData={studyData}
+              selectedStudy={selectedQSortStudy}
+              setSelectedStudy={setSelectedQSortStudy}
             />
           )}
         </Box>
@@ -1637,8 +1633,8 @@ export default function ProjectManagement() {
           <FormControl fullWidth margin="normal">
             <InputLabel>Select Study</InputLabel>
             <Select
-              value={selectedStudy}
-              onChange={(e) => setSelectedStudy(e.target.value)}
+              value={selectedQSortStudy}
+              onChange={(e) => setSelectedQSortStudy(e.target.value)}
               label="Select Study"
             >
               {studyData.map((study) => (
