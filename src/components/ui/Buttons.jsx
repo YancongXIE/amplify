@@ -1,7 +1,7 @@
 export function ButtonSmallPrimary({ children, onClick }) {
   return (
     <button
-      className="btn btn-sm btn-primary text-primary-content"
+      className="btn btn-sm btn-primary text-white"
       onClick={onClick}
     >
       {children}
@@ -47,14 +47,14 @@ export function ButtonSmallWide({ children }) {
   );
 }
 
-export function ButtonMediumWide({ children, onClick, disabled }) {
+export function ButtonMediumWide({ children, onClick, disabled, className = "" }) {
   return (
     <button
       className={`btn btn-md btn-primary btn-wide ${
         disabled
           ? "!bg-primary opacity-60 text-primary-content !text-opacity-100 cursor-not-allowed"
           : "text-primary-content"
-      }`}
+      } ${className}`}
       onClick={onClick}
       disabled={disabled}
       tabIndex={disabled ? "-1" : "0"}

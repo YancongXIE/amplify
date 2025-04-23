@@ -42,17 +42,31 @@ function Register({ toggle }) {
     inputReset: passwordInputReset,
   } = usePasswordValidator();
 
-  // State variables for local area, error and success messages
-  const [localArea, setLocalArea] = useState("");
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-
-  // Function to handle registration
   const handleRegister = async (e) => {
     e.preventDefault();
+    
+    // 验证所有字段
+    firstNameMarkAsTouched();
+    lastNameMarkAsTouched();
+    emailMarkAsTouched();
+    passwordMarkAsTouched();
+
+    if (firstNameHasError || lastNameHasError || emailHasError || passwordHasError) {
+      setError("Please fill in all fields correctly.");
+      return;
+    }
+
     try {
+      // 清除之前的消息
+      setError(null);
+      setSuccess(null);
+      // 显示加载状态
+      setIsLoading(true);
+
       const response = await fetch(`${kAPI_URL}/users/register`, {
         method: "POST",
         headers: {
@@ -72,51 +86,53 @@ function Register({ toggle }) {
         throw new Error(data.message || "Registration failed");
       }
 
+      // 重置表单
       firstNameInputReset();
       lastNameInputReset();
       emailInputReset();
       passwordInputReset();
-      setLocalArea("");
-      // Reset error and set success message
-      setError(null);
+
+      // 显示成功消息
       setSuccess("Registration successful!");
-      setIsLoading(true);
+      
+      // 延迟关闭模态框
       setTimeout(() => {
-        document.getElementById("auth_modal").close();
+        document.getElementById("admin_login_modal").close();
         setSuccess(null);
         setIsLoading(false);
-      }, 3000);
+      }, 2000);
     } catch (error) {
       setError(error.message);
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col">
       <h2 className="card-title">Register</h2>
-      {/* Input field for first name */}
+
       <InputField
         label="First Name"
         type="text"
-        placeholder="First Name"
+        placeholder="Please enter your first name"
         value={firstName}
         onChange={firstNameChangeHandler}
         onBlur={firstNameMarkAsTouched}
         hasError={firstNameHasError}
-        errorMessage="Name can only contain letters, hyphens, apostrophes, periods, and spaces."
+        errorMessage="Please enter your first name."
       />
-      {/* Input field for last name */}
+
       <InputField
         label="Last Name"
         type="text"
-        placeholder="Last Name"
+        placeholder="Please enter your last name"
         value={lastName}
         onChange={lastNameChangeHandler}
         onBlur={lastNameMarkAsTouched}
         hasError={lastNameHasError}
-        errorMessage="Name can only contain letters, hyphens, apostrophes, periods, and spaces."
+        errorMessage="Please enter your last name."
       />
-      {/* Input field for email */}
+
       <InputField
         label="Email"
         type="text"
@@ -127,19 +143,18 @@ function Register({ toggle }) {
         hasError={emailHasError}
         errorMessage="Please enter a valid email address."
       />
-      {/* Input field for password */}
+
       <InputField
         label="Password"
         type="password"
-        placeholder="Password"
+        placeholder="Please enter your password"
         value={passwordValue}
         onChange={passwordChangeHandler}
         onBlur={passwordMarkAsTouched}
         hasError={passwordHasError}
-        errorMessage="Password must be more than 8 characters long, include an uppercase letter, a number, and a special character."
+        errorMessage="Please enter a valid password."
       />
 
-      {/* Register button */}
       <div className="form-control mt-6">
         <ButtonMediumFullWide
           onClick={handleRegister}
@@ -149,7 +164,6 @@ function Register({ toggle }) {
         </ButtonMediumFullWide>
       </div>
 
-      {/* Error and success messages */}
       {error && <div className="pt-3 text-error">{error}</div>}
       {success && <div className="pt-3 text-success">{success}</div>}
 

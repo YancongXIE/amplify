@@ -8,7 +8,7 @@ export default function Card({ imgSrc, imgAlt, cardTitle, cardContent }) {
         <h2 className="card-title">{cardTitle}</h2>
         <p>{cardContent}</p>
         <div className="card-actions justify-end">
-          <button className="btn btn-secondary mt-4 text-primary-content">Find out more</button>
+          <button className="btn btn-secondary mt-4 text-white">Find out more</button>
         </div>
       </div>
     </div>

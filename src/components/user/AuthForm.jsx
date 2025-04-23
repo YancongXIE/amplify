@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Login from "./login/Login";
-import Register from "./register/Register";
+import Login from "./login/login";
+import Register from "./register/register";
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true); // State to toggle between login and register

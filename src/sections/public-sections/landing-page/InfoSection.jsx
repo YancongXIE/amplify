@@ -21,7 +21,7 @@ export default function InfoSection() {
               <p className="py-6 text-secondary-content">
                 Introduce who we are, what we do, and provide contact details.
               </p>
-              <ButtonMediumWide>Contact our research team.</ButtonMediumWide>
+              <ButtonMediumWide className="text-white">Contact our research team.</ButtonMediumWide>
             </div>
           </div>
         </div>

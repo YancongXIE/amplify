@@ -7,12 +7,11 @@ import {
   useEmailValidator,
   usePasswordValidator,
 } from "../../../hooks/input-sanitizers/useAuthValidators";
-import { AuthContext } from "../../../context/AuthProvider"; // Import AuthContext
+import { AuthContext } from "../../../context/AuthProvider";
 import { kAPI_URL } from '../../../api/utils/constants';
 
-const Login = ({ toggle }) => {
-  const [userType, setUserType] = useState("respondent");
-  const [username, setUsername] = useState(""); // New: username state
+const Login = ({ userType, toggle }) => {
+  const [username, setUsername] = useState("");
   const {
     value: emailValue,
     hasError: emailHasError,
@@ -29,12 +28,10 @@ const Login = ({ toggle }) => {
     inputReset: passwordInputReset,
   } = usePasswordValidator();
 
-  // State variables for error and success messages
   const { setIsLoggedIn, fetchUserData } = useContext(AuthContext);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  // useNavigate hook to navigate to different pages
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -89,23 +86,22 @@ const Login = ({ toggle }) => {
       }
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("userType", userType); // Store user type
+      localStorage.setItem("userType", userType);
       setIsLoggedIn(true);
       await fetchUserData();
       setError(null);
-      setUsername(""); // Reset username
+      setUsername("");
       emailInputReset();
       passwordInputReset();
       setSuccess("Login successful!");
       setIsLoading(false);
       setTimeout(() => {
-        document.getElementById("auth_modal").close();
+        document.getElementById(`${userType}_login_modal`).close();
         navigate("/dataanalyst");
         setSuccess(null);
         setIsLoading(false);
       }, 2000);
     } catch (err) {
-      // If the response is not successful, set error message
       setError(err.message || "Invalid credentials. Please try again.");
       setSuccess(null);
       setIsLoading(false);
@@ -114,36 +110,7 @@ const Login = ({ toggle }) => {
 
   return (
     <div className="flex flex-col">
-      <h2 className="card-title">Login</h2>
-      
-      {/* User type selector */}
-      <div className="form-control mb-4">
-        <label className="label">
-          <span className="label-text">Login as</span>
-        </label>
-        <div className="flex gap-2">
-          <button
-            className={`btn btn-sm ${userType === "respondent" ? "btn-primary" : "btn-ghost"}`}
-            onClick={() => {
-              setUserType("respondent");
-              setUsername("");
-              emailInputReset();
-            }}
-          >
-            Respondent
-          </button>
-          <button
-            className={`btn btn-sm ${userType === "admin" ? "btn-primary" : "btn-ghost"}`}
-            onClick={() => {
-              setUserType("admin");
-              setUsername("");
-              emailInputReset();
-            }}
-          >
-            Admin
-          </button>
-        </div>
-      </div>
+      <h2 className="card-title">{userType === "admin" ? "Admin Login" : "Respondent Login"}</h2>
 
       {/* Show different input fields based on user type */}
       {userType === "admin" ? (
@@ -176,7 +143,7 @@ const Login = ({ toggle }) => {
         value={passwordValue}
         onChange={passwordChangeHandler}
         onBlur={passwordMarkAsTouched}
-        onKeyDown={(e) => e.key === "Enter" && handleLogin(e)} // Trigger login on Enter key press
+        onKeyDown={(e) => e.key === "Enter" && handleLogin(e)}
       />
       {/* Login button */}
       <div className="form-control mt-6">
@@ -191,12 +158,14 @@ const Login = ({ toggle }) => {
       {error && <div className="pt-3 text-error">{error}</div>}
       {success && <div className="pt-3 text-success">{success}</div>}
 
-      <p className="mt-4">
-        Don't have an account?{" "}
-        <button className="text-info hover:underline" onClick={toggle}>
-          Register here
-        </button>
-      </p>
+      {userType === "admin" && (
+        <p className="mt-4">
+          Don't have an account?{" "}
+          <button className="text-info hover:underline" onClick={toggle}>
+            Register here
+          </button>
+        </p>
+      )}
     </div>
   );
 };

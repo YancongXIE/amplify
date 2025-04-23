@@ -16,11 +16,25 @@ export default {
         publicTheme: {
           primary: "#C05621",
           secondary: "#086189",
-          "primary-content": "#ffffff",
+          "primary-content": "#0f172a",
           "secondary-content": "#0f172a",
           "base-100": "#edebe7",
-          "base-200": "#374151",
-          "base-300": "#1f2937",
+          "base-200": "#f3f4f6",
+          "base-300": "#ffffff",
+          info: "#237496",
+          success: "#289b6f",
+          warning: "#fccd5e",
+          error: "#f87979",
+        },
+      },
+      {
+        darkTheme: {
+          primary: "#CD2B61",
+          "primary-content": "#edebe7",
+          secondary: "#0ea5e9",
+          "secondary-content": "#f1f5f9",
+          "base-200": "#1f2937",
+          "base-300": "#111827",
           info: "#237496",
           success: "#289b6f",
           warning: "#fccd5e",
@@ -44,7 +58,7 @@ export default {
       {
         noosaDarkTheme: {
           primary: "#CD2B61",
-          "primary-content": "#edebe7",
+          "primary-content": "#ffffff",
           secondary: "#0ea5e9",
           "secondary-content": "#f1f5f9",
           "base-200": "#1f2937",

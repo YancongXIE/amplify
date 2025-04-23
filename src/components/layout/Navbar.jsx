@@ -133,15 +133,24 @@ export default function Navbar() {
       </div>
 
       <div className="navbar-end pr-4">
-        {/* If user is not logged in, show login button, else show logout button */}
+        {/* If user is not logged in, show login buttons, else show logout button */}
         {!isLoggedIn ? (
-          <ButtonSmallPrimary
-            onClick={() => {
-              document.getElementById("auth_modal").showModal();
-            }}
-          >
-            Login
-          </ButtonSmallPrimary>
+          <div className="flex gap-2">
+            <ButtonSmallPrimary
+              onClick={() => {
+                document.getElementById("respondent_login_modal").showModal();
+              }}
+            >
+              Respondent Login
+            </ButtonSmallPrimary>
+            <ButtonSmallPrimary
+              onClick={() => {
+                document.getElementById("admin_login_modal").showModal();
+              }}
+            >
+              Admin Login
+            </ButtonSmallPrimary>
+          </div>
         ) : (
           <div className="flex items-center gap-4">
             <Link to={getDefaultPage()} className="text-primary-content hover:text-primary">
