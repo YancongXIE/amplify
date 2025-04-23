@@ -35,7 +35,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { kAPI_URL } from '../../api/utils/constants';
 
 // Table component
-const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, clientUsers = null, currentTab, statementData, showBulkAddModal, setShowBulkAddModal, respondentData, selectedStudy, setSelectedStudy }) => {
+const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, clientUsers = null, currentTab, statementData, showBulkAddModal, setShowBulkAddModal, respondentData, selectedStudy, setSelectedStudy, selectedStudyForQSort, setSelectedStudyForQSort }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({});
@@ -172,7 +172,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
           return;
         }
         
-        // Ensure studyID is set correctly
+        // Ensure studyID is correctly set
         const studyID = selectedStudy || submitData.studyID;
         if (!studyID) {
           setSnackbar({
@@ -202,7 +202,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
           return;
         }
         
-        // Ensure ID is numeric
+        // Ensure IDs are numbers
         submitData.studyID = parseInt(submitData.studyID);
         submitData.statementID = parseInt(submitData.statementID);
         
@@ -247,12 +247,12 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
     handleClose();
   };
 
-  // Add download data function
+  // 添加下载数据函数
   const handleDownload = () => {
-    // Get current table column names, using label instead of headerName
+    // 获取当前表格的列名，使用 label 而不是 headerName
     const headers = columns.map(col => col.label);
     
-    // Use filteredData instead of data, so only download current filtered data
+    // 使用 filteredData 而不是 data，这样只下载当前筛选后的数据
     const rows = filteredData.map(item => {
       return columns.map(col => {
         if (col.field === 'studyID' && parentData) {
@@ -262,31 +262,31 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
         if (col.field.startsWith('statements.')) {
           const statementKey = col.field.split('.')[1];
           const value = item.statements[statementKey];
-          // Handle 0 and null values
+          // 处理0值和null值
           if (value === 0) return '0';
           return value !== null && value !== undefined ? value : '-';
         }
-        // Skip actions column
+        // 跳过 actions 列
         if (col.field === 'actions') return null;
         return item[col.field];
-      }).filter(Boolean); // Remove null values
+      }).filter(Boolean); // 移除 null 值
     });
 
-    // Create CSV content, add header
+    // 创建CSV内容，添加表头
     const csvContent = [
       headers.filter((_, index) => columns[index].field !== 'actions').join(','),
       ...rows.map(row => row.join(','))
     ].join('\n');
 
-    // Create Blob object
+    // 创建Blob对象
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     
-    // Create download link
+    // 创建下载链接
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
     
-    // Determine file name based on current tab
+    // 根据当前标签页设置文件名
     let fileName = 'data';
     switch(currentTab) {
       case 0:
@@ -312,7 +312,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
         break;
     }
     
-    // Add filter information to file name
+    // 添加筛选信息到文件名
     let filterInfo = '';
     if (selectedStudy && (currentTab === 3 || currentTab === 4 || currentTab === 5)) {
       const study = parentData.find(s => s.studyID === selectedStudy);
@@ -322,7 +322,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
     link.setAttribute('download', `${fileName}${filterInfo}_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     
-    // Trigger download
+    // 触发下载
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -364,15 +364,16 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
         </Box>
       </Box>
 
-      {/* Add study selector */}
+      {/* 添加研究选择器 */}
       {(currentTab === 3 || currentTab === 4 || currentTab === 5 || currentTab === 6) && (
         <FormControl fullWidth sx={{ mb: 2 }}>
           <InputLabel>Select Study</InputLabel>
           <Select
-            value={selectedStudy}
-            onChange={(e) => setSelectedStudy(e.target.value)}
+            value={currentTab === 6 ? selectedStudyForQSort : selectedStudy}
+            onChange={(e) => currentTab === 6 ? setSelectedStudyForQSort(e.target.value) : setSelectedStudy(e.target.value)}
             label="Select Study"
           >
+            <MenuItem value="">All Studies</MenuItem>
             {parentData.map((study) => (
               <MenuItem key={study.studyID} value={study.studyID}>
                 {study.studyName}
@@ -469,7 +470,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
           {selectedItem ? 'Edit Data' : 'Add Data'}
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
-          {/* Respondent table form fields */}
+          {/* Respondent 表单字段 */}
           {currentTab === 3 && (
             <>
               <TextField
@@ -522,7 +523,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
             </>
           )}
 
-          {/* Add Distribution selector */}
+          {/* 添加 Distribution 选择器 */}
           {parentData && currentTab === 1 && (
             <TextField
               select
@@ -540,10 +541,10 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
             </TextField>
           )}
 
-          {/* Study Statement table form fields */}
+          {/* Study Statement 表单字段 */}
           {currentTab === 5 && (
             <>
-              {/* Show study selector only when not selected */}
+              {/* 只在未选择 study 时显示 study 选择器 */}
               {!selectedStudy && (
                 <FormControl fullWidth margin="normal">
                   <InputLabel>Select Study</InputLabel>
@@ -561,7 +562,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                   </Select>
                 </FormControl>
               )}
-              {/* Show only one statement selector */}
+              {/* 只显示一个 statement 选择器 */}
               <FormControl fullWidth margin="normal">
                 <InputLabel>Select Statement</InputLabel>
                 <Select
@@ -580,7 +581,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
             </>
           )}
 
-          {/* Q-Sort data edit form */}
+          {/* Q-Sort 数据编辑表单 */}
           {currentTab === 6 && (
             <>
               <FormControl fullWidth margin="normal">
@@ -591,7 +592,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                   label="Select Respondent"
                   required
                 >
-                  {respondentData && respondentData.map((respondent) => (
+                  {respondentData.map((respondent) => (
                     <MenuItem key={respondent.respondentID} value={respondent.respondentID}>
                       {respondent.username}
                     </MenuItem>
@@ -626,7 +627,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
           )}
 
           {columns.map((column) => {
-            // Hide auto increment ID input, adminID field, and studyStatement field
+            // 隐藏 auto increment 的 ID 输入框、adminID 字段和 studyStatement 的字段
             if (column.field === 'studyID' || column.field === 'distributionID' || 
                 column.field === 'respondentID' || column.field === 'roundID' ||
                 column.field === 'studyStatementID' || column.field === 'statementID' ||
@@ -714,7 +715,8 @@ export default function ProjectManagement() {
   const [clientUsers, setClientUsers] = useState([]);
   const [showBulkAddModal, setShowBulkAddModal] = useState(false);
   const [bulkCount, setBulkCount] = useState(1);
-  const [selectedQSortStudy, setSelectedQSortStudy] = useState('');
+  const [selectedStudy, setSelectedStudy] = useState('');
+  const [selectedStudyForQSort, setSelectedStudyForQSort] = useState('');
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -1258,7 +1260,7 @@ export default function ProjectManagement() {
 
   // Add batch add processing function
   const handleBulkAdd = async () => {
-    if (!selectedQSortStudy) {
+    if (!selectedStudy) {
       setSnackbar({
         open: true,
         message: 'Please select a study',
@@ -1279,7 +1281,7 @@ export default function ProjectManagement() {
         return {
           username: `respondent_${timestamp}_${index + 1}`,
           rawPassword: Math.random().toString(36).slice(-8),
-          studyID: parseInt(selectedQSortStudy)
+          studyID: parseInt(selectedStudy)
         };
       });
 
@@ -1297,7 +1299,7 @@ export default function ProjectManagement() {
         setRespondentData(updatedData);
         setShowBulkAddModal(false);
         setBulkCount(1);
-        setSelectedQSortStudy('');
+        setSelectedStudy('');
         setSnackbar({
           open: true,
           message: `Successfully added ${bulkCount} respondents`,
@@ -1321,50 +1323,64 @@ export default function ProjectManagement() {
 
   // Add new data processing function in ProjectManagement component
   const processQSortData = () => {
-    if (!selectedQSortStudy) return [];
-
-    // Get all respondents for the selected study
-    const studyRespondents = respondentData.filter(r => r.studyID === parseInt(selectedQSortStudy));
+    // Get all unique respondents who have submitted Q-Sort data
+    const respondentsWithData = [...new Set(qSortData.map(item => item.respondentID))];
     
-    // Get all statements for the selected study
-    const studyStatements = studyStatementData
-      .filter(s => s.studyID === parseInt(selectedQSortStudy))
-      .map(s => {
-        const statement = statementData.find(st => st.statementID === s.statementID);
-        return {
-          studyStatementID: s.studyStatementID,
-          statementID: s.statementID,
-          short: statement ? statement.short : 'Unknown'
-        };
-      });
+    // Get all unique statements for the selected study
+    const uniqueStatements = selectedStudyForQSort
+      ? [...new Set(studyStatementData
+          .filter(s => s.studyID === parseInt(selectedStudyForQSort))
+          .map(s => {
+            const statement = statementData.find(st => st.statementID === s.statementID);
+            return statement ? statement.statementID : null;
+          }))]
+          .filter(Boolean)
+      : [...new Set(qSortData.map(item => {
+          const studyStatement = studyStatementData.find(s => s.studyStatementID === item.studyStatementID);
+          if (studyStatement) {
+            const statement = statementData.find(s => s.statementID === studyStatement.statementID);
+            return statement ? statement.statementID : null;
+          }
+          return null;
+        }))]
+        .filter(Boolean);
+
+    // Filter respondents by selected study if a study is selected
+    const filteredRespondents = selectedStudyForQSort
+      ? respondentData.filter(r => 
+          r.studyID === parseInt(selectedStudyForQSort) && 
+          respondentsWithData.includes(r.respondentID)
+        )
+      : respondentData.filter(r => respondentsWithData.includes(r.respondentID));
 
     // Create new data structure
-    return studyRespondents
-      .filter(respondent => {
-        // Check if respondent has submitted any Q-Sort data
-        const hasSubmittedData = qSortData.some(q => 
-          q.respondentID === respondent.respondentID
-        );
-        return hasSubmittedData;
-      })
-      .map(respondent => {
-        const rowData = {
-          respondentID: respondent.respondentID,
-          username: respondent.username,
-          statements: {}
-        };
+    return filteredRespondents.map(respondent => {
+      const rowData = {
+        respondentID: respondent.respondentID,
+        username: respondent.username,
+        statements: {}
+      };
 
-        // Add Q-Sort value for each statement
-        studyStatements.forEach(statement => {
+      // Add Q-Sort value for each statement
+      uniqueStatements.forEach(statementId => {
+        const studyStatement = studyStatementData.find(s => 
+          s.statementID === statementId && 
+          (!selectedStudyForQSort || s.studyID === parseInt(selectedStudyForQSort))
+        );
+        if (studyStatement) {
           const qSortItem = qSortData.find(q => 
             q.respondentID === respondent.respondentID && 
-            q.studyStatementID === statement.studyStatementID
+            q.studyStatementID === studyStatement.studyStatementID
           );
-          rowData.statements[statement.short] = qSortItem ? qSortItem.qSortValue : null;
-        });
-
-        return rowData;
+          const statement = statementData.find(s => s.statementID === statementId);
+          if (statement) {
+            rowData.statements[statement.short] = qSortItem ? qSortItem.qSortValue : null;
+          }
+        }
       });
+
+      return rowData;
+    });
   };
 
   return (
@@ -1458,8 +1474,8 @@ export default function ProjectManagement() {
               showBulkAddModal={showBulkAddModal}
               setShowBulkAddModal={setShowBulkAddModal}
               respondentData={respondentData}
-              selectedStudy={selectedQSortStudy}
-              setSelectedStudy={setSelectedQSortStudy}
+              selectedStudy={selectedStudy}
+              setSelectedStudy={setSelectedStudy}
             />
           )}
           {currentTab === 4 && (
@@ -1471,6 +1487,8 @@ export default function ProjectManagement() {
               onAdd={(tablename, newData) => handleAdd('studyRound', newData)}
               parentData={studyData}
               currentTab={currentTab}
+              selectedStudy={selectedStudy}
+              setSelectedStudy={setSelectedStudy}
             />
           )}
           {currentTab === 5 && (
@@ -1483,6 +1501,8 @@ export default function ProjectManagement() {
               parentData={studyData}
               statementData={statementData}
               currentTab={currentTab}
+              selectedStudy={selectedStudy}
+              setSelectedStudy={setSelectedStudy}
             />
           )}
           {currentTab === 6 && (
@@ -1512,8 +1532,17 @@ export default function ProjectManagement() {
                           // Find all Q-Sort data for this respondent
                           const qSortItems = qSortData.filter(q => q.respondentID === item.respondentID);
                           
+                          // Log
+                          console.log('Q-Sort data to be deleted:', {
+                            respondentID: item.respondentID,
+                            username: item.username,
+                            qSortItems: qSortItems
+                          });
+
                           // Delete all related Q-Sort data
                           qSortItems.forEach(qSortItem => {
+                            console.log('Deleting Q-Sort data:', qSortItem);
+                            // Send delete request
                             fetch(`${kAPI_URL}/api/qsort/${qSortItem.respondentID}`, {
                               method: 'DELETE',
                               headers: {
@@ -1534,12 +1563,14 @@ export default function ProjectManagement() {
                             })
                             .then(data => {
                               if (data.Error) {
+                                console.error('Delete failed:', data.Message);
                                 setSnackbar({
                                   open: true,
                                   message: data.Message || 'Delete failed',
                                   severity: 'error',
                                 });
                               } else {
+                                console.log('Delete successful:', data.Message);
                                 // Refresh data
                                 fetchData('qsort').then(data => setQSortData(data));
                                 setSnackbar({
@@ -1550,6 +1581,7 @@ export default function ProjectManagement() {
                               }
                             })
                             .catch(error => {
+                              console.error('Delete request failed:', error);
                               setSnackbar({
                                 open: true,
                                 message: 'Delete request failed: ' + error.message,
@@ -1575,8 +1607,8 @@ export default function ProjectManagement() {
               statementData={statementData}
               studyStatementData={studyStatementData}
               parentData={studyData}
-              selectedStudy={selectedQSortStudy}
-              setSelectedStudy={setSelectedQSortStudy}
+              selectedStudyForQSort={selectedStudyForQSort}
+              setSelectedStudyForQSort={setSelectedStudyForQSort}
             />
           )}
         </Box>
@@ -1633,8 +1665,8 @@ export default function ProjectManagement() {
           <FormControl fullWidth margin="normal">
             <InputLabel>Select Study</InputLabel>
             <Select
-              value={selectedQSortStudy}
-              onChange={(e) => setSelectedQSortStudy(e.target.value)}
+              value={selectedStudy}
+              onChange={(e) => setSelectedStudy(e.target.value)}
               label="Select Study"
             >
               {studyData.map((study) => (
