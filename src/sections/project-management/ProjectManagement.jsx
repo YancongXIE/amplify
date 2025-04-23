@@ -60,17 +60,17 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
 
   const handleEdit = (item) => {
     setSelectedItem(item);
-    // 根据当前标签页初始化表单数据
+    // Initialize form data based on current tab
     let formDataWithPassword = { ...item };
     
-    if (currentTab === 3) { // Respondent 表
+    if (currentTab === 3) { // Respondent table
       formDataWithPassword = {
         ...item,
         password: item.rawPassword || '',
         showPassword: false
       };
-    } else if (currentTab === 6) { // Q-Sort 表
-      // 找到对应的 statementID
+    } else if (currentTab === 6) { // Q-Sort table
+      // Find corresponding statementID
       const studyStatement = studyStatementData.find(s => 
         s.studyStatementID === item.studyStatementID
       );
@@ -90,25 +90,31 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
 
   const handleAdd = () => {
     setSelectedItem(null);
-    // 根据当前标签页初始化表单数据
+    // Initialize form data based on current tab
     let initialFormData = {};
-    if (currentTab === 3) { // Respondent 表
+    if (currentTab === 3) { // Respondent table
       initialFormData = {
         username: '',
         password: '',
         studyID: selectedStudy || '',
         showPassword: false
       };
-    } else if (currentTab === 4) { // Study Round 表
+    } else if (currentTab === 4) { // Study Round table
       initialFormData = {
         studyID: selectedStudy || '',
         studyRound: '',
         roundDate: new Date().toISOString().split('T')[0]
       };
-    } else if (currentTab === 5) { // Study Statement 表
+    } else if (currentTab === 5) { // Study Statement table
       initialFormData = {
         studyID: selectedStudy || '',
         statementID: ''
+      };
+    } else if (currentTab === 1) { // Study table
+      initialFormData = {
+        studyName: '',
+        studyDate: new Date().toISOString().split('T')[0],
+        distributionID: ''
       };
     }
     setFormData(initialFormData);
@@ -123,15 +129,15 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
 
   const handleSubmit = () => {
     if (selectedItem) {
-      // 如果是编辑操作，确保密码字段被正确处理
+      // For edit operation, ensure password field is handled correctly
       let submitData = { ...formData };
-      if (currentTab === 3) { // Respondent 表
+      if (currentTab === 3) { // Respondent table
         if (submitData.password) {
           submitData.rawPassword = submitData.password;
           delete submitData.password;
         }
-      } else if (currentTab === 6) { // Q-Sort 表
-        // 找到对应的 studyStatementID
+      } else if (currentTab === 6) { // Q-Sort table
+        // Find corresponding studyStatementID
         const studyStatement = studyStatementData.find(s => 
           s.statementID === submitData.statementID
         );
@@ -153,10 +159,10 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
       }
       onEdit(selectedItem, submitData);
     } else {
-      // 如果是添加操作，根据选择模式添加研究ID
+      // For add operation, add studyID based on selection mode
       let submitData = { ...formData };
       
-      // 确保 respondent 表格的数据包含所有必要字段
+      // Ensure respondent table data contains all required fields
       if (currentTab === 3) {
         if (!submitData.username || !submitData.password) {
           setSnackbar({
@@ -167,7 +173,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
           return;
         }
         
-        // 确保 studyID 被正确设置
+        // Ensure studyID is set correctly
         const studyID = selectedStudy || submitData.studyID;
         if (!studyID) {
           setSnackbar({
@@ -178,15 +184,15 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
           return;
         }
         
-        // 创建新的提交数据对象
+        // Create new submit data object
         submitData = {
           username: submitData.username,
-          rawPassword: submitData.password,  // 直接使用 password 字段作为 rawPassword
+          rawPassword: submitData.password,  // Use password field directly as rawPassword
           studyID: parseInt(studyID)
         };
       }
 
-      // 确保 studyStatement 表格的数据包含所有必要字段
+      // Ensure studyStatement table data contains all required fields
       if (currentTab === 5) {
         if (!submitData.studyID || !submitData.statementID) {
           setSnackbar({
@@ -197,7 +203,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
           return;
         }
         
-        // 确保 ID 是数字
+        // Ensure ID is numeric
         submitData.studyID = parseInt(submitData.studyID);
         submitData.statementID = parseInt(submitData.statementID);
         
@@ -211,7 +217,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
         }
       }
       
-      // 根据当前标签页确定表名
+      // Determine table name based on current tab
       let tableName;
       switch (currentTab) {
         case 0:
@@ -236,18 +242,18 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
           tableName = 'distribution';
       }
       
-      // 直接传递处理后的数据
+      // Pass processed data directly
       onAdd(tableName, submitData);
     }
     handleClose();
   };
 
-  // 添加下载数据函数
+  // Add download data function
   const handleDownload = () => {
-    // 获取当前表格的列名，使用 label 而不是 headerName
+    // Get current table column names, using label instead of headerName
     const headers = columns.map(col => col.label);
     
-    // 使用 filteredData 而不是 data，这样只下载当前筛选后的数据
+    // Use filteredData instead of data, so only download current filtered data
     const rows = filteredData.map(item => {
       return columns.map(col => {
         if (col.field === 'studyID' && parentData) {
@@ -257,31 +263,31 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
         if (col.field.startsWith('statements.')) {
           const statementKey = col.field.split('.')[1];
           const value = item.statements[statementKey];
-          // 处理0值和null值
+          // Handle 0 and null values
           if (value === 0) return '0';
           return value !== null && value !== undefined ? value : '-';
         }
-        // 跳过 actions 列
+        // Skip actions column
         if (col.field === 'actions') return null;
         return item[col.field];
-      }).filter(Boolean); // 移除 null 值
+      }).filter(Boolean); // Remove null values
     });
 
-    // 创建CSV内容，添加表头
+    // Create CSV content, add header
     const csvContent = [
       headers.filter((_, index) => columns[index].field !== 'actions').join(','),
       ...rows.map(row => row.join(','))
     ].join('\n');
 
-    // 创建Blob对象
+    // Create Blob object
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     
-    // 创建下载链接
+    // Create download link
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
     
-    // 根据当前标签页设置文件名
+    // Determine file name based on current tab
     let fileName = 'data';
     switch(currentTab) {
       case 0:
@@ -307,7 +313,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
         break;
     }
     
-    // 添加筛选信息到文件名
+    // Add filter information to file name
     let filterInfo = '';
     if (selectedStudy && (currentTab === 3 || currentTab === 4 || currentTab === 5)) {
       const study = parentData.find(s => s.studyID === selectedStudy);
@@ -317,7 +323,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
     link.setAttribute('download', `${fileName}${filterInfo}_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     
-    // 触发下载
+    // Trigger download
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -359,7 +365,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
         </Box>
       </Box>
 
-      {/* 添加研究选择器 */}
+      {/* Add study selector */}
       {(currentTab === 3 || currentTab === 4 || currentTab === 5) && (
         <FormControl fullWidth sx={{ mb: 2 }}>
           <InputLabel>Select Study</InputLabel>
@@ -465,7 +471,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
           {selectedItem ? 'Edit Data' : 'Add Data'}
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
-          {/* Respondent 表单字段 */}
+          {/* Respondent table form fields */}
           {currentTab === 3 && (
             <>
               <TextField
@@ -518,7 +524,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
             </>
           )}
 
-          {/* 添加 Distribution 选择器 */}
+          {/* Add Distribution selector */}
           {parentData && currentTab === 1 && (
             <TextField
               select
@@ -536,10 +542,10 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
             </TextField>
           )}
 
-          {/* Study Statement 表单字段 */}
+          {/* Study Statement table form fields */}
           {currentTab === 5 && (
             <>
-              {/* 只在未选择 study 时显示 study 选择器 */}
+              {/* Show study selector only when not selected */}
               {!selectedStudy && (
                 <FormControl fullWidth margin="normal">
                   <InputLabel>Select Study</InputLabel>
@@ -557,7 +563,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                   </Select>
                 </FormControl>
               )}
-              {/* 只显示一个 statement 选择器 */}
+              {/* Show only one statement selector */}
               <FormControl fullWidth margin="normal">
                 <InputLabel>Select Statement</InputLabel>
                 <Select
@@ -576,7 +582,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
             </>
           )}
 
-          {/* Q-Sort 数据编辑表单 */}
+          {/* Q-Sort data edit form */}
           {currentTab === 6 && (
             <>
               <FormControl fullWidth margin="normal">
@@ -622,7 +628,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
           )}
 
           {columns.map((column) => {
-            // 隐藏 auto increment 的 ID 输入框、adminID 字段和 studyStatement 的字段
+            // Hide auto increment ID input, adminID field, and studyStatement field
             if (column.field === 'studyID' || column.field === 'distributionID' || 
                 column.field === 'respondentID' || column.field === 'roundID' ||
                 column.field === 'studyStatementID' || column.field === 'statementID' ||
@@ -740,7 +746,7 @@ export default function ProjectManagement() {
   // Get admin user data
   const fetchClientUsers = async () => {
     try {
-      const response = await fetch(`${kAPI_URL}/users/clients`, {
+      const response = await fetch(`${kAPI_URL}/users/all`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -798,34 +804,90 @@ export default function ProjectManagement() {
     distribution: [
       { field: 'distributionID', label: 'ID' },
       { field: 'distributionDetails', label: 'Distribution Details' },
-      { field: 'adminID', label: 'Admin ID', readOnly: true }
+      { 
+        field: 'adminID', 
+        label: 'Admin Name',
+        render: (item) => {
+          const admin = clientUsers.find(user => user.id === item.adminID);
+          return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
+        }
+      }
     ],
     study: [
       { field: 'studyID', label: 'ID' },
       { field: 'studyName', label: 'Study Name' },
       { field: 'studyDate', label: 'Study Date' },
-      { field: 'distributionID', label: 'Distribution ID' },
-      { field: 'adminID', label: 'Admin ID', readOnly: true }
+      { 
+        field: 'distributionID', 
+        label: 'Distribution',
+        render: (item) => {
+          const distribution = distributionData.find(d => d.distributionID === item.distributionID);
+          return distribution ? distribution.distributionDetails : 'Unknown';
+        }
+      },
+      { 
+        field: 'adminID', 
+        label: 'Admin Name',
+        render: (item) => {
+          const admin = clientUsers.find(user => user.id === item.adminID);
+          return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
+        }
+      }
     ],
     respondent: [
       { field: 'respondentID', label: 'ID' },
       { field: 'username', label: 'Username' },
       { field: 'rawPassword', label: 'Password' },
-      { field: 'studyID', label: 'Study ID' },
-      { field: 'adminID', label: 'Admin ID', readOnly: true }
+      { 
+        field: 'studyID', 
+        label: 'Study',
+        render: (item) => {
+          const study = studyData.find(s => s.studyID === item.studyID);
+          return study ? study.studyName : 'Unknown';
+        }
+      },
+      { 
+        field: 'adminID', 
+        label: 'Admin Name',
+        render: (item) => {
+          const admin = clientUsers.find(user => user.id === item.adminID);
+          return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
+        }
+      }
     ],
     studyRound: [
       { field: 'roundID', label: 'ID' },
-      { field: 'studyID', label: 'Study ID' },
+      { 
+        field: 'studyID', 
+        label: 'Study',
+        render: (item) => {
+          const study = studyData.find(s => s.studyID === item.studyID);
+          return study ? study.studyName : 'Unknown';
+        }
+      },
       { field: 'studyRound', label: 'Study Round' },
       { field: 'roundDate', label: 'Round Date' },
-      { field: 'adminID', label: 'Admin ID', readOnly: true }
+      { 
+        field: 'adminID', 
+        label: 'Admin Name',
+        render: (item) => {
+          const admin = clientUsers.find(user => user.id === item.adminID);
+          return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
+        }
+      }
     ],
     statement: [
       { field: 'statementID', label: 'ID' },
       { field: 'short', label: 'Short' },
       { field: 'statementText', label: 'Statement Text' },
-      { field: 'adminID', label: 'Admin ID', readOnly: true }
+      { 
+        field: 'adminID', 
+        label: 'Admin Name',
+        render: (item) => {
+          const admin = clientUsers.find(user => user.id === item.adminID);
+          return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
+        }
+      }
     ],
     studyStatement: [
       { field: 'studyStatementID', label: 'ID' },
@@ -845,7 +907,14 @@ export default function ProjectManagement() {
           return statement ? statement.short : 'Unknown';
         }
       },
-      { field: 'adminID', label: 'Admin ID', readOnly: true }
+      { 
+        field: 'adminID', 
+        label: 'Admin Name',
+        render: (item) => {
+          const admin = clientUsers.find(user => user.id === item.adminID);
+          return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
+        }
+      }
     ],
     qsort: [
       { 
@@ -869,7 +938,14 @@ export default function ProjectManagement() {
         }
       },
       { field: 'qSortValue', label: 'Q-Sort Value' },
-      { field: 'adminID', label: 'Admin ID', readOnly: true }
+      { 
+        field: 'adminID', 
+        label: 'Admin Name',
+        render: (item) => {
+          const admin = clientUsers.find(user => user.id === item.adminID);
+          return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
+        }
+      }
     ]
   };
 
