@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Box,
   Tabs,
@@ -33,6 +33,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DownloadIcon from '@mui/icons-material/Download';
 import { kAPI_URL } from '../../api/utils/constants';
+import { AuthContext } from '../../context/AuthProvider';
 
 // Table component
 const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, clientUsers = null, currentTab, statementData, showBulkAddModal, setShowBulkAddModal, respondentData, selectedStudy, setSelectedStudy, selectedStudyForQSort, setSelectedStudyForQSort }) => {
@@ -704,6 +705,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
 
 // Main component
 export default function ProjectManagement() {
+  const { user } = useContext(AuthContext);
   const [currentTab, setCurrentTab] = useState(0);
   const [distributionData, setDistributionData] = useState([]);
   const [studyData, setStudyData] = useState([]);
@@ -808,6 +810,9 @@ export default function ProjectManagement() {
         field: 'adminID', 
         label: 'Admin Name',
         render: (item) => {
+          if (user?.role === 'admin') {
+            return user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Current Admin';
+          }
           const admin = clientUsers.find(user => user.id === item.adminID);
           return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
         }
@@ -829,6 +834,9 @@ export default function ProjectManagement() {
         field: 'adminID', 
         label: 'Admin Name',
         render: (item) => {
+          if (user?.role === 'admin') {
+            return user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Current Admin';
+          }
           const admin = clientUsers.find(user => user.id === item.adminID);
           return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
         }
@@ -850,6 +858,9 @@ export default function ProjectManagement() {
         field: 'adminID', 
         label: 'Admin Name',
         render: (item) => {
+          if (user?.role === 'admin') {
+            return user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Current Admin';
+          }
           const admin = clientUsers.find(user => user.id === item.adminID);
           return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
         }
@@ -871,6 +882,9 @@ export default function ProjectManagement() {
         field: 'adminID', 
         label: 'Admin Name',
         render: (item) => {
+          if (user?.role === 'admin') {
+            return user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Current Admin';
+          }
           const admin = clientUsers.find(user => user.id === item.adminID);
           return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
         }
@@ -884,6 +898,9 @@ export default function ProjectManagement() {
         field: 'adminID', 
         label: 'Admin Name',
         render: (item) => {
+          if (user?.role === 'admin') {
+            return user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Current Admin';
+          }
           const admin = clientUsers.find(user => user.id === item.adminID);
           return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
         }
@@ -911,6 +928,9 @@ export default function ProjectManagement() {
         field: 'adminID', 
         label: 'Admin Name',
         render: (item) => {
+          if (user?.role === 'admin') {
+            return user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Current Admin';
+          }
           const admin = clientUsers.find(user => user.id === item.adminID);
           return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
         }
@@ -942,6 +962,9 @@ export default function ProjectManagement() {
         field: 'adminID', 
         label: 'Admin Name',
         render: (item) => {
+          if (user?.role === 'admin') {
+            return user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Current Admin';
+          }
           const admin = clientUsers.find(user => user.id === item.adminID);
           return admin ? `${admin.firstName} ${admin.lastName}` : 'Unknown';
         }
