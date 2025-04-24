@@ -24,6 +24,7 @@ import {
   InputLabel,
   Snackbar,
   Alert,
+  FormHelperText,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
@@ -345,7 +346,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
               Bulk Add
             </Button>
           )}
-          {currentTab !== 6 && (
+          {currentTab !== 3 && currentTab !== 6 && (
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -481,6 +482,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                 value={formData.username || ''}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 required
+                helperText="Required field"
               />
               <Box sx={{ position: 'relative', mt: 2 }}>
                 <TextField
@@ -490,6 +492,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                   value={formData.password || ''}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
+                  helperText="Required field"
                   InputProps={{
                     endAdornment: (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -533,6 +536,8 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
               label="Distribution"
               value={formData.distributionID || ''}
               onChange={(e) => setFormData({ ...formData, distributionID: e.target.value })}
+              required
+              helperText="Required field"
             >
               {parentData.map((item) => (
                 <MenuItem key={item.distributionID} value={item.distributionID}>
@@ -547,13 +552,12 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
             <>
               {/* 只在未选择 study 时显示 study 选择器 */}
               {!selectedStudy && (
-                <FormControl fullWidth margin="normal">
+                <FormControl fullWidth margin="normal" required>
                   <InputLabel>Select Study</InputLabel>
                   <Select
                     value={formData.studyID || ''}
                     onChange={(e) => setFormData({ ...formData, studyID: e.target.value })}
                     label="Select Study"
-                    required
                   >
                     {parentData.map((study) => (
                       <MenuItem key={study.studyID} value={study.studyID}>
@@ -561,16 +565,16 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                       </MenuItem>
                     ))}
                   </Select>
+                  <FormHelperText>Required field</FormHelperText>
                 </FormControl>
               )}
               {/* 只显示一个 statement 选择器 */}
-              <FormControl fullWidth margin="normal">
+              <FormControl fullWidth margin="normal" required>
                 <InputLabel>Select Statement</InputLabel>
                 <Select
                   value={formData.statementID || ''}
                   onChange={(e) => setFormData({ ...formData, statementID: e.target.value })}
                   label="Select Statement"
-                  required
                 >
                   {statementData.map((statement) => (
                     <MenuItem key={statement.statementID} value={statement.statementID}>
@@ -578,6 +582,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                     </MenuItem>
                   ))}
                 </Select>
+                <FormHelperText>Required field</FormHelperText>
               </FormControl>
             </>
           )}
@@ -585,13 +590,12 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
           {/* Q-Sort 数据编辑表单 */}
           {currentTab === 6 && (
             <>
-              <FormControl fullWidth margin="normal">
+              <FormControl fullWidth margin="normal" required>
                 <InputLabel>Select Respondent</InputLabel>
                 <Select
                   value={formData.respondentID || ''}
                   onChange={(e) => setFormData({ ...formData, respondentID: e.target.value })}
                   label="Select Respondent"
-                  required
                 >
                   {respondentData.map((respondent) => (
                     <MenuItem key={respondent.respondentID} value={respondent.respondentID}>
@@ -599,14 +603,14 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                     </MenuItem>
                   ))}
                 </Select>
+                <FormHelperText>Required field</FormHelperText>
               </FormControl>
-              <FormControl fullWidth margin="normal">
+              <FormControl fullWidth margin="normal" required>
                 <InputLabel>Select Statement</InputLabel>
                 <Select
                   value={formData.statementID || ''}
                   onChange={(e) => setFormData({ ...formData, statementID: e.target.value })}
                   label="Select Statement"
-                  required
                 >
                   {statementData.map((statement) => (
                     <MenuItem key={statement.statementID} value={statement.statementID}>
@@ -614,6 +618,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                     </MenuItem>
                   ))}
                 </Select>
+                <FormHelperText>Required field</FormHelperText>
               </FormControl>
               <TextField
                 fullWidth
@@ -623,6 +628,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                 value={formData.qSortValue || ''}
                 onChange={(e) => setFormData({ ...formData, qSortValue: parseInt(e.target.value) })}
                 required
+                helperText="Required field"
               />
             </>
           )}
@@ -646,6 +652,8 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                   type="date"
                   value={formData[column.field] || ''}
                   onChange={(e) => setFormData({ ...formData, [column.field]: e.target.value })}
+                  required
+                  helperText="Required field"
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -662,6 +670,8 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                   label={column.label}
                   value={formData[column.field] || ''}
                   onChange={(e) => setFormData({ ...formData, [column.field]: e.target.value })}
+                  required
+                  helperText="Required field"
                 />
               );
             }
@@ -676,6 +686,8 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                   type="number"
                   value={formData[column.field] || ''}
                   onChange={(e) => setFormData({ ...formData, [column.field]: parseInt(e.target.value) })}
+                  required
+                  helperText="Required field"
                 />
               );
             }
@@ -688,6 +700,8 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
                 label={column.label}
                 value={formData[column.field] || ''}
                 onChange={(e) => setFormData({ ...formData, [column.field]: e.target.value })}
+                required
+                helperText="Required field"
               />
             );
           })}
@@ -1033,10 +1047,62 @@ export default function ProjectManagement() {
     }
   };
 
+  // 验证Distribution数据格式
+  const validateDistributionFormat = (distributionDetails) => {
+    // 检查是否为空
+    if (!distributionDetails) {
+      return { isValid: false, message: 'Distribution details cannot be empty' };
+    }
+
+    // 分割字符串并检查数量
+    const numbers = distributionDetails.split(',');
+    if (numbers.length !== 5) {
+      return { isValid: false, message: 'Distribution must contain exactly 5 numbers, following the format of "x,x,x,x,x", e.g., "1,2,3,2,1".' };
+    }
+
+    // 定义投票选项的映射
+    const votingOptions = {
+      0: '-2',
+      1: '-1',
+      2: '0',
+      3: '1',
+      4: '2'
+    };
+
+    // 检查每个部分是否为非负数
+    for (let i = 0; i < numbers.length; i++) {
+      const num = numbers[i].trim();
+      if (num === '') {
+        return { isValid: false, message: `Distribution value for voting option ${votingOptions[i]} cannot be empty` };
+      }
+      if (isNaN(num)) {
+        return { isValid: false, message: `Distribution value for voting option ${votingOptions[i]} must be a number` };
+      }
+      if (parseFloat(num) < 0) {
+        return { isValid: false, message: `Distribution value for voting option ${votingOptions[i]} cannot be negative` };
+      }
+    }
+
+    return { isValid: true };
+  };
+
   const handleEdit = async (table, item, newData) => {
     if (!table || !newData) return;
 
     try {
+      // 如果是Distribution表，验证数据格式
+      if (table === 'distribution') {
+        const validation = validateDistributionFormat(newData.distributionDetails);
+        if (!validation.isValid) {
+          setSnackbar({
+            open: true,
+            message: validation.message,
+            severity: 'error',
+          });
+          return;
+        }
+      }
+
       // Remove adminID from newData
       const { adminID, ...dataToUpdate } = newData || {};
       
@@ -1118,6 +1184,19 @@ export default function ProjectManagement() {
     if (!tablename) return;
 
     try {
+      // 如果是Distribution表，验证数据格式
+      if (tablename === 'distribution') {
+        const validation = validateDistributionFormat(newData.distributionDetails);
+        if (!validation.isValid) {
+          setSnackbar({
+            open: true,
+            message: validation.message,
+            severity: 'error',
+          });
+          return;
+        }
+      }
+
       let response;
       switch (tablename) {
         case 'distribution':
@@ -1684,8 +1763,10 @@ export default function ProjectManagement() {
             value={bulkCount}
             onChange={(e) => setBulkCount(Math.max(1, parseInt(e.target.value) || 1))}
             inputProps={{ min: 1 }}
+            required
+            helperText="Required field"
           />
-          <FormControl fullWidth margin="normal">
+          <FormControl fullWidth margin="normal" required>
             <InputLabel>Select Study</InputLabel>
             <Select
               value={selectedStudy}
@@ -1698,6 +1779,7 @@ export default function ProjectManagement() {
                 </MenuItem>
               ))}
             </Select>
+            <FormHelperText>Required field</FormHelperText>
           </FormControl>
         </DialogContent>
         <DialogActions>
