@@ -18,6 +18,7 @@ export default function DashboardSidebar({ isCollapsed }) {
   const adminItems = [
     { href: "/dashboard", label: "Upset Demo", icon: <Icons.Home /> },
     { href: "/project-management", label: "Project Management", icon: <Icons.Folder /> },
+    { href: "/study-configuration", label: "Study Configuration", icon: <Icons.DataStack /> },
     { href: "/dataanalyst", label: "Ranking Application Demo", icon: <Icons.CPUChip/> },
     { href: "/guide", label: "Guide", icon: <Icons.InfoIcon /> },
     { href: "/settings", label: "Settings", icon: <Icons.SettingsCog /> },

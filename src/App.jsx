@@ -21,6 +21,7 @@ import Guide from "./pages/data-vis-pages/Guide";
 import Settings from "./pages/data-vis-pages/Settings";
 import UserManagement from "./pages/data-vis-pages/UserManagement";
 import ProjectManagement from "./sections/project-management/ProjectManagement";
+import StudyConfiguration from "./sections/study-configuration/StudyConfiguration";
 // auth imports:
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -108,6 +109,16 @@ function App() {
               <ProtectedRoute allowedRoles={['manager', 'admin']}>
                 <DashboardLayout>
                   <ProjectManagement />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/study-configuration"
+            element={
+              <ProtectedRoute allowedRoles={['manager', 'admin']}>
+                <DashboardLayout>
+                  <StudyConfiguration />
                 </DashboardLayout>
               </ProtectedRoute>
             }
