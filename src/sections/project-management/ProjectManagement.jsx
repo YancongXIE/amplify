@@ -1377,11 +1377,15 @@ export default function ProjectManagement() {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       };
 
+      // 获取选中的研究名称
+      const selectedStudyData = studyData.find(s => s.studyID === parseInt(selectedStudy));
+      const studyName = selectedStudyData ? selectedStudyData.studyName.replace(/\s+/g, '_') : '';
+
       // Generate batch add data
       const respondents = Array.from({ length: bulkCount }, (_, index) => {
         const timestamp = new Date().getTime();
         return {
-          username: `respondent_${timestamp}_${index + 1}`,
+          username: `${studyName}_respondent_${timestamp}_${index + 1}`,
           rawPassword: Math.random().toString(36).slice(-8),
           studyID: parseInt(selectedStudy)
         };
