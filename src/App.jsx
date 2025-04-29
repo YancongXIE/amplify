@@ -26,6 +26,22 @@ import StudyConfiguration from "./sections/study-configuration/StudyConfiguratio
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 function App() {
+  const { user } = useContext(AuthContext);
+
+  const getDefaultPage = () => {
+    if (!user) return "/";
+    switch (user.role) {
+      case "respondent":
+        return "/ranking-exercise";
+      case "manager":
+        return "/database-management";
+      case "admin":
+        return "/study-configuration";
+      default:
+        return "/guide";
+    }
+  };
+
   return (
     <Router>
       <ThemeProvider>
@@ -40,7 +56,7 @@ function App() {
           />
 
           <Route
-            path="/dataanalyst"
+            path="/ranking-demo"
             element={
               <ProtectedRoute>
                 <DashboardLayout>
@@ -62,7 +78,7 @@ function App() {
           />
 
           <Route
-            path="/dashboard"
+            path="/upset-demo"
             element={
               <ProtectedRoute>
                 <DashboardLayout>
@@ -73,6 +89,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/guide"
             element={
@@ -83,6 +100,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/settings"
             element={
@@ -104,7 +122,7 @@ function App() {
             }
           />
           <Route
-            path="/project-management"
+            path="/database-management"
             element={
               <ProtectedRoute allowedRoles={['manager', 'admin']}>
                 <DashboardLayout>
@@ -124,12 +142,12 @@ function App() {
             }
           />
           
-          {/* Handle all non-existent paths, redirect to /dataanalyst */}
+          {/* Handle all non-existent paths, redirect based on user role */}
           <Route
             path="*"
             element={
               <ProtectedRoute>
-                <Navigate to="/dataanalyst" replace />
+                <Navigate to={getDefaultPage()} replace />
               </ProtectedRoute>
             }
           />

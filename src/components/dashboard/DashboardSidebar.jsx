@@ -16,11 +16,11 @@ export default function DashboardSidebar({ isCollapsed }) {
   const location = useLocation();
 
   const adminItems = [
-    { href: "/dashboard", label: "Upset Demo", icon: <Icons.Home /> },
-    { href: "/project-management", label: "Project Management", icon: <Icons.Folder /> },
-    { href: "/study-configuration", label: "Study Configuration", icon: <Icons.DataStack /> },
-    { href: "/dataanalyst", label: "Ranking Application Demo", icon: <Icons.CPUChip/> },
     { href: "/guide", label: "Guide", icon: <Icons.InfoIcon /> },
+    { href: "/study-configuration", label: "Study Configuration", icon: <Icons.DataStack /> },
+    { href: "/database-management", label: "Database Management", icon: <Icons.Folder /> },
+    { href: "/ranking-demo", label: "Ranking Application Demo", icon: <Icons.CPUChip/> },
+    { href: "/upset-demo", label: "Upset Demo", icon: <Icons.Home /> },
     { href: "/settings", label: "Settings", icon: <Icons.SettingsCog /> },
   ];
 

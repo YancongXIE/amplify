@@ -10,14 +10,18 @@ const routes = [
     children: [
       {
         path: '/',
-        element: <Navigate to="/dashboard" replace />,
+        element: <Navigate to="/upset-demo" replace />,
       },
       {
-        path: '/dashboard',
+        path: '/upset-demo',
         element: <Dashboard />,
       },
       {
-        path: '/project-management',
+        path: '/ranking-demo',
+        element: <DataAnalyst />,
+      },
+      {
+        path: '/database-management',
         element: <ProjectManagement />,
       },
       // ... 其他路由

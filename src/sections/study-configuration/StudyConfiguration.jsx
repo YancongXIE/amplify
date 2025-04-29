@@ -24,6 +24,8 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import DownloadIcon from '@mui/icons-material/Download';
+import UploadIcon from '@mui/icons-material/Upload';
 import MuiAlert from '@mui/material/Alert';
 import { kAPI_URL } from '../../api/utils/constants';
 import { AuthContext } from '../../context/AuthProvider';
@@ -149,7 +151,7 @@ const StudyConfiguration = () => {
   const steps = [
     {
       label: 'Distribution Setup',
-      description: 'Configure the distribution pattern for your study',
+      description: 'Configure the distribution pattern for your study. Select one existing distribution or create a new one.',
       table: 'distribution',
       columns: [
         { field: 'distributionID', label: 'ID' },
@@ -169,7 +171,7 @@ const StudyConfiguration = () => {
     },
     {
       label: 'Study Creation',
-      description: 'Create a new study and link it to a distribution',
+      description: 'Create a new study and link it to the selected distribution.',
       table: 'study',
       columns: [
         { field: 'studyID', label: 'ID' },
@@ -198,7 +200,7 @@ const StudyConfiguration = () => {
     },
     {
       label: 'Statement Management',
-      description: 'Add statements for your study',
+      description: 'Add statements for your study. Click on show statements to view all existing statements. You can add new statements by uploading a CSV file or manually adding statements one by one.',
       table: 'statement',
       columns: [
         { field: 'statementID', label: 'ID' },
@@ -219,7 +221,7 @@ const StudyConfiguration = () => {
     },
     {
       label: 'Study Statement Assignment',
-      description: 'Assign statements to your study',
+      description: 'Assign statements to your study by clicking the boxes in the select column. You can also unselect statements by clicking the boxes again.',
       table: 'studyStatement',
       columns: [
         { field: 'short', label: 'Short' },
@@ -242,7 +244,7 @@ const StudyConfiguration = () => {
     },
     {
       label: 'Study Round Setup',
-      description: 'Configure study rounds',
+      description: 'Configure your study rounds. By default, you should start with the first round.',
       table: 'studyRound',
       columns: [
         { field: 'roundID', label: 'ID' },
@@ -271,7 +273,7 @@ const StudyConfiguration = () => {
     },
     {
       label: 'Respondent Management',
-      description: 'Add respondents to your study',
+      description: 'Add respondents to your study by selecting the number of respondents you want to add.',
       table: 'respondent',
       columns: [
         { field: 'respondentID', label: 'ID' },
@@ -525,43 +527,45 @@ const StudyConfiguration = () => {
         setErrorMessage(validation.message);
         return;
       }
-      setErrorMessage(''); // Clear error message
     }
 
-    // Update saved configuration
+    // Create new saved configuration object
     const newSavedConfig = { ...savedConfig };
-    
-    if (currentStep === 'studyStatement' && selectedStatements.length > 0) {
-      newSavedConfig.studyStatement = {
-        studyID: editConfig.study.studyID,
-        statements: selectedStatements
+
+    if (currentStep === 'distribution') {
+      setErrorMessage('');
+      newSavedConfig.distribution = {
+        ...editConfig.distribution
+      };
+    } else if (currentStep === 'study') {
+      if (!editConfig.study.studyName || !editConfig.study.studyDate) {
+        setErrorMessage('Please fill in all required fields');
+        return;
+      }
+      if (!savedConfig.distribution?.distributionDetails) {
+        setErrorMessage('Please complete the distribution step first');
+        return;
+      }
+      newSavedConfig.study = {
+        studyName: editConfig.study.studyName,
+        studyDate: editConfig.study.studyDate,
+        distributionID: savedConfig.distribution.distributionID
       };
     } else if (currentStep === 'statement' && tempStatements.length > 0) {
       newSavedConfig.statement = {
         statements: tempStatements
       };
-    } else if (currentStep === 'study') {
-      // Ensure all required fields have values
-      if (!editConfig.study.studyName || !editConfig.study.studyDate) {
-        setErrorMessage('Please fill in all required fields');
-        return;
-      }
-
-      const distributionID = selectedRows.distribution?.distributionID || savedConfig.distribution?.distributionID;
-      if (!distributionID) {
-        setErrorMessage('Please select a distribution');
-        return;
-      }
-
-      newSavedConfig.study = {
-        studyName: editConfig.study.studyName,
-        studyDate: editConfig.study.studyDate,
-        distributionID: distributionID
-      };
-    } else if (currentStep === 'distribution') {
-      newSavedConfig.distribution = {
-        ...editConfig.distribution,
-        distributionID: selectedRows.distribution?.distributionID
+    } else if (currentStep === 'studyStatement' && selectedStatements.length > 0) {
+      // 合并新语句和旧语句的 ID
+      const allStatements = [
+        ...tempStatements.map(stmt => stmt.statementID),
+        ...statementData.map(stmt => stmt.statementID)
+      ];
+      
+      // 只保存选中的语句
+      newSavedConfig.studyStatement = {
+        studyID: savedConfig.study.studyID,
+        statements: selectedStatements.filter(id => allStatements.includes(id))
       };
     } else if (currentStep === 'studyRound') {
       // Ensure study round configuration contains all required data
@@ -637,10 +641,10 @@ const StudyConfiguration = () => {
         throw new Error('Distribution configuration is missing');
       }
 
-      if (savedConfig.distribution.distributionID) {
+      if (savedConfig.distribution.distributionID && savedConfig.distribution.distributionID !== 'new') {
         // Use existing distribution
         distributionID = savedConfig.distribution.distributionID;
-      } else if (savedConfig.distribution.distributionDetails) {
+      } else {
         // Create new distribution
         const distributionResponse = await fetch(`${kAPI_URL}/api/distribution`, {
           method: 'POST',
@@ -656,10 +660,38 @@ const StudyConfiguration = () => {
           throw new Error(`Failed to create distribution: ${errorData.message || distributionResponse.statusText}`);
         }
 
-        const distributionData = await distributionResponse.json();
-        distributionID = distributionData.data.distributionID;
-      } else {
-        throw new Error('Distribution details are missing');
+        // Query the latest distribution record
+        const distributionQueryResponse = await fetch(`${kAPI_URL}/api/distribution`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (!distributionQueryResponse.ok) {
+          throw new Error('Failed to query distribution data');
+        }
+
+        const distributionQueryData = await distributionQueryResponse.json();
+
+        // Find the newly created distribution
+        const latestDistribution = distributionQueryData.data.find(dist => 
+          dist.distributionDetails === savedConfig.distribution.distributionDetails
+        );
+
+        if (!latestDistribution) {
+          throw new Error('Failed to find newly created distribution');
+        }
+
+        distributionID = latestDistribution.distributionID;
+
+        // Update distributionID in savedConfig
+        setSavedConfig(prev => ({
+          ...prev,
+          distribution: {
+            ...prev.distribution,
+            distributionID: distributionID
+          }
+        }));
       }
 
       // 2. Process study
@@ -728,30 +760,72 @@ const StudyConfiguration = () => {
 
       // 3. Process statements
       const statementIDs = [];
+      const tempToActualIDMap = new Map(); // 用于存储临时ID到实际ID的映射
+      
       if (savedConfig.statement?.statements && Array.isArray(savedConfig.statement.statements)) {
         for (const statement of savedConfig.statement.statements) {
-          const statementResponse = await fetch(`${kAPI_URL}/api/statement`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              short: statement.short,
-              statementText: statement.statementText,
-              adminID: user?.id
-            })
-          });
+          // Check if it's a new statement (temporary ID starts with 'temp_')
+          if (statement.statementID.startsWith('temp_')) {
+            // Create new statement
+            const statementResponse = await fetch(`${kAPI_URL}/api/statement`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({
+                short: statement.short,
+                statementText: statement.statementText,
+                adminID: user?.id
+              })
+            });
 
-          if (!statementResponse.ok) {
-            throw new Error('Failed to create statement');
+            if (!statementResponse.ok) {
+              throw new Error('Failed to create statement');
+            }
+
+            // Query the latest statement record
+            const statementQueryResponse = await fetch(`${kAPI_URL}/api/statement`, {
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+              }
+            });
+
+            if (!statementQueryResponse.ok) {
+              throw new Error('Failed to query statement data');
+            }
+
+            const statementQueryData = await statementQueryResponse.json();
+
+            // Find the newly created statement
+            const latestStatement = statementQueryData.data.find(stmt => 
+              stmt.short === statement.short && 
+              stmt.statementText === statement.statementText
+            );
+
+            if (!latestStatement) {
+              throw new Error('Failed to find newly created statement');
+            }
+
+            // 保存临时ID到实际ID的映射
+            tempToActualIDMap.set(statement.statementID, latestStatement.statementID);
+            statementIDs.push(latestStatement.statementID);
+          } else {
+            // Use existing statement ID
+            statementIDs.push(statement.statementID);
           }
-
-          const statementData = await statementResponse.json();
-          statementIDs.push(statementData.data.statementID);
         }
       }
 
       // 4. Process study statements
       if (savedConfig.studyStatement?.statements && Array.isArray(savedConfig.studyStatement.statements)) {
-        for (const statementID of savedConfig.studyStatement.statements) {
+        // 转换选中的语句ID（将临时ID转换为实际ID）
+        const selectedStatementIDs = savedConfig.studyStatement.statements.map(id => {
+          if (typeof id === 'string' && id.startsWith('temp_')) {
+            return tempToActualIDMap.get(id);
+          }
+          return id;
+        }).filter(id => id); // 过滤掉undefined的值
+
+        // 使用转换后的ID创建study statement关联
+        for (const statementID of selectedStatementIDs) {
           const studyStatementResponse = await fetch(`${kAPI_URL}/api/studyStatement`, {
             method: 'POST',
             headers,
@@ -762,8 +836,12 @@ const StudyConfiguration = () => {
             })
           });
 
+          console.log("studyID", studyID);
+          console.log("statementID", statementID);
+
           if (!studyStatementResponse.ok) {
-            throw new Error('Failed to create study statement');
+            const errorData = await studyStatementResponse.json();
+            throw new Error(`Failed to create study statement: ${errorData.message || studyStatementResponse.statusText}`);
           }
         }
       }
@@ -984,6 +1062,73 @@ const StudyConfiguration = () => {
     setEditingRespondent(null);
   };
 
+  // Add function to download CSV template
+  const downloadCSVTemplate = () => {
+    const csvContent = "short,statementText\nExample1,This is an example statement 1\nExample2,This is an example statement 2";
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'statement_template.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Add function to handle CSV file upload
+  const handleCSVUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      const lines = text.split('\n');
+      const headers = lines[0].split(',').map(header => header.trim());
+      
+      if (headers[0] !== 'short' || headers[1] !== 'statementText') {
+        setSnackbar({
+          open: true,
+          message: 'Invalid CSV format. Please use the provided template.',
+          severity: 'error'
+        });
+        return;
+      }
+
+      const newStatements = [];
+      for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        
+        const values = lines[i].split(',').map(value => value.trim());
+        if (values.length >= 2) {
+          newStatements.push({
+            statementID: `temp_${Date.now()}_${i}`,
+            short: values[0],
+            statementText: values[1],
+            adminID: user?.id
+          });
+        }
+      }
+
+      if (newStatements.length > 0) {
+        setTempStatements(prev => [...prev, ...newStatements]);
+        setSnackbar({
+          open: true,
+          message: `${newStatements.length} statements have been added successfully`,
+          severity: 'success'
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: 'No valid statements found in the CSV file',
+          severity: 'warning'
+        });
+      }
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-8">
@@ -1132,7 +1277,7 @@ const StudyConfiguration = () => {
                 {step.table !== 'studyStatement' && step.table !== 'respondent' && (
                   <Box sx={{ mt: 4 }}>
                     <Typography variant="h6" sx={{ mb: 2 }}>
-                      {savedConfig[step.table] ? 'Edit Configuration' : 'New Configuration'}
+                      {savedConfig[step.table] ? `Edit ${step.label.replace(/ (Setup|Creation|Management)$/, '')}` : `New ${step.label.replace(/ (Setup|Creation|Management)$/, '')}`}
                     </Typography>
                     <Paper sx={{ p: 3, mb: 2 }}>
                       {step.table === 'distribution' && (
@@ -1178,36 +1323,108 @@ const StudyConfiguration = () => {
 
                       {step.table === 'statement' && (
                         <>
-                          <TextField
-                            fullWidth
-                            label="Short"
-                            value={editConfig.statement.short}
-                            onChange={(e) => handleConfigChange('statement', 'short', e.target.value)}
-                            sx={{ mb: 2 }}
-                          />
-                          <TextField
-                            fullWidth
-                            label="Statement Text"
-                            multiline
-                            rows={4}
-                            value={editConfig.statement.statementText}
-                            onChange={(e) => handleConfigChange('statement', 'statementText', e.target.value)}
-                            sx={{ mb: 2 }}
-                          />
-                          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-                            <Button
-                              variant="contained"
-                              onClick={handleAddTempStatement}
-                              disabled={!editConfig.statement.short || !editConfig.statement.statementText}
-                            >
-                              Add Statement
-                            </Button>
+                          {/* 批量上传部分 */}
+                          <Box sx={{ mb: 4 }}>
+                            <Typography variant="subtitle1" sx={{ mb: 2, color: 'primary.main', fontWeight: 'bold' }}>
+                              Bulk Upload Statements
+                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                              <Button
+                                variant="outlined"
+                                startIcon={<DownloadIcon />}
+                                onClick={downloadCSVTemplate}
+                                sx={{ 
+                                  borderColor: 'primary.main',
+                                  color: 'primary.main',
+                                  '&:hover': {
+                                    borderColor: 'primary.dark',
+                                    backgroundColor: 'primary.light',
+                                    color: 'primary.dark'
+                                  }
+                                }}
+                              >
+                                Download Template
+                              </Button>
+                              <Typography variant="body2" color="text.secondary">
+                                Download the CSV template and fill in your statements
+                              </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                              <Button
+                                variant="contained"
+                                component="label"
+                                startIcon={<UploadIcon />}
+                                sx={{ 
+                                  backgroundColor: 'primary.main',
+                                  '&:hover': {
+                                    backgroundColor: 'primary.dark'
+                                  }
+                                }}
+                              >
+                                Upload CSV
+                                <input
+                                  type="file"
+                                  hidden
+                                  accept=".csv"
+                                  onChange={handleCSVUpload}
+                                />
+                              </Button>
+                              <Typography variant="body2" color="text.secondary">
+                                Upload your filled CSV file to add multiple statements at once
+                              </Typography>
+                            </Box>
+                          </Box>
+
+                          <Divider sx={{ my: 3 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              OR
+                            </Typography>
+                          </Divider>
+
+                          {/* 单个语句添加部分 */}
+                          <Box>
+                            <Typography variant="subtitle1" sx={{ mb: 2, color: 'primary.main', fontWeight: 'bold' }}>
+                              Add Individual Statement
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              label="Short"
+                              value={editConfig.statement.short}
+                              onChange={(e) => handleConfigChange('statement', 'short', e.target.value)}
+                              sx={{ mb: 2 }}
+                            />
+                            <TextField
+                              fullWidth
+                              label="Statement Text"
+                              multiline
+                              rows={4}
+                              value={editConfig.statement.statementText}
+                              onChange={(e) => handleConfigChange('statement', 'statementText', e.target.value)}
+                              sx={{ mb: 2 }}
+                            />
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                              <Button
+                                variant="contained"
+                                onClick={handleAddTempStatement}
+                                disabled={!editConfig.statement.short || !editConfig.statement.statementText}
+                                sx={{ 
+                                  backgroundColor: 'primary.main',
+                                  '&:hover': {
+                                    backgroundColor: 'primary.dark'
+                                  }
+                                }}
+                              >
+                                Add Statement
+                              </Button>
+                            </Box>
                           </Box>
 
                           {/* 临时语句表格 */}
                           {tempStatements.length > 0 && (
                             <Box sx={{ mt: 4 }}>
-                              <Typography variant="h6" sx={{ mb: 2 }}>Temporary Statements</Typography>
+                              <Typography variant="subtitle1" sx={{ mb: 2, color: 'primary.main', fontWeight: 'bold' }}>
+                                Temporary Statements ({tempStatements.length})
+                              </Typography>
                               <TableContainer 
                                 component={Paper} 
                                 sx={{ 

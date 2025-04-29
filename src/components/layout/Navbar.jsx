@@ -15,11 +15,11 @@ export default function Navbar() {
       case "respondent":
         return "/ranking-exercise";
       case "manager":
-        return "/project-management";
+        return "/database-management";
       case "admin":
-        return "/dashboard";
+        return "/study-configuration";
       default:
-        return "/dataanalyst";
+        return "/guide";
     }
   };
 
