@@ -16,12 +16,13 @@ export default function InfoSection() {
                 Opinion collection specialist
               </p>
               <h1 className="text-5xl font-bold text-secondary-content">
-                A more detailed introduction to Claros. 
+                Combining Q-Methodology and Delphi to capture opinion diversity
               </h1>
               <p className="py-6 text-secondary-content">
-                Introduce who we are, what we do, and provide contact details.
+              Claros enables organisations to surface multiple coherent “schools of thought”, 
+              track where convergence emerges, and produce actionable outputs that are both inclusive and analytically robust. 
               </p>
-              <ButtonMediumWide className="text-white">Contact our research team.</ButtonMediumWide>
+              <ButtonMediumWide className="text-white">Contact the research team</ButtonMediumWide>
             </div>
           </div>
         </div>

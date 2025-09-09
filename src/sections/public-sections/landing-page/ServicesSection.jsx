@@ -7,7 +7,7 @@ export default function ServicesSection() {
         <div className="flex flex-col items-center">
           <div className="">
             <h1 className="pl-10 pb-6 text-2xl text-primary-content font-bold">
-              Projects
+              Claros Projects
             </h1>
           </div>
           <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 m-10 px-4">

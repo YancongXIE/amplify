@@ -65,7 +65,7 @@ export default function Navbar() {
 
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-50 mt-3 w-52 p-2 shadow"
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-50 mt-3 w-[1500px] p-2 shadow"
           >
             <li>
               <a>Menu</a>
@@ -74,18 +74,14 @@ export default function Navbar() {
                   <Link to="/about" className="text-primary-content">About</Link>
                 </li>
                 <li>
-                  <Link to="/results" className="text-primary-content">Results</Link>
+                  <Link to="/results" className="text-primary-content">Results (admin)</Link>
                 </li>
                 <li>
-                  <Link to="/ranking" className="text-primary-content">Ranking</Link>
+                  <Link to="/ranking" className="text-primary-content">Ranking (admin)</Link>
                 </li>
-                {isLoggedIn && (
-                  <li>
-                    <Link to={getDefaultPage()} className="text-primary-content">
-                      Dashboard
-                    </Link>
-                  </li>
-                )}
+                <li>
+                  <Link to="/dashboard" className="text-primary-content">Dashboard (admin)</Link>
+                </li>
               </ul>
             </li>
             <li>
@@ -111,18 +107,14 @@ export default function Navbar() {
                   <Link to="/about" className="text-primary-content">About</Link>
                 </li>
                 <li>
-                  <Link to="/results" className="text-primary-content">Results</Link>
+                  <Link to="/results" className="text-primary-content">Results (admin)</Link>
                 </li>
                 <li>
-                  <Link to="/ranking" className="text-primary-content">Ranking</Link>
+                  <Link to="/ranking" className="text-primary-content">Ranking (admin)</Link>
                 </li>
-                {isLoggedIn && (
-                  <li>
-                    <Link to={getDefaultPage()} className="text-primary-content">
-                      Dashboard
-                    </Link>
-                  </li>
-                )}
+                <li>
+                  <Link to="/dashboard" className="text-primary-content">Dashboard (admin)</Link>
+                </li>
               </ul>
             </details>
           </li>
