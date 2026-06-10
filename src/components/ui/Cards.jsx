@@ -1,4 +1,6 @@
-export default function Card({ imgSrc, imgAlt, cardTitle, cardContent }) {
+import { Link } from "react-router-dom";
+
+export default function Card({ imgSrc, imgAlt, cardTitle, cardContent, href }) {
   return (
     <div className="card card-compact bg-base-300 w-full shadow-xl">
       <figure>
@@ -8,7 +10,15 @@ export default function Card({ imgSrc, imgAlt, cardTitle, cardContent }) {
         <h2 className="card-title">{cardTitle}</h2>
         <p>{cardContent}</p>
         <div className="card-actions justify-end">
-          <button className="btn btn-secondary mt-4 text-white">Find out more</button>
+          {href ? (
+            <Link to={href} className="btn btn-secondary mt-4 text-white">
+              Find out more
+            </Link>
+          ) : (
+            <button className="btn btn-secondary mt-4 text-white">
+              Find out more
+            </button>
+          )}
         </div>
       </div>
     </div>

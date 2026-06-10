@@ -14,8 +14,9 @@ export default function ServicesSection() {
             <Card
               imgSrc="assets/images/lukas-blazek-mcSDtbWXUZU-unsplash.jpg"
               imgAlt="Data dashboard"
-              cardTitle="Project 1"
-              cardContent="Project 1 description"
+              cardTitle="Saudi IS Study"
+              cardContent="Key Information Systems Issues Facing Saudi Arabian Organizations"
+              href="/projects/saudi-is-study"
             />
             <Card
               imgSrc="assets/images/glenn-carstens-peters-npxXWgQ33ZQ-unsplash.jpg"
