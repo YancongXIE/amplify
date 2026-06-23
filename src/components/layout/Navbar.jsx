@@ -13,7 +13,7 @@ export default function Navbar() {
     if (!user) return "/";
     switch (user.role) {
       case "respondent":
-        return "/ranking-exercise";
+        return "/round-1-results";
       case "manager":
         return "/database-management";
       case "admin":

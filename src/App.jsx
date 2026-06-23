@@ -19,6 +19,7 @@ import SaudiISStudyRound1ResultsPage from "./pages/public-pages/SaudiISStudyRoun
 import DashboardHome from "./pages/data-vis-pages/DashboardHome";
 import DataAnalyst from "./pages/data-vis-pages/DataAnalyst";
 import RankingExercise from "./pages/data-vis-pages/RankingExercise";
+import RespondentRound1ResultsPage from "./pages/data-vis-pages/RespondentRound1ResultsPage";
 import Guide from "./pages/data-vis-pages/Guide";
 import Settings from "./pages/data-vis-pages/Settings";
 import UserManagement from "./pages/data-vis-pages/UserManagement";
@@ -34,7 +35,7 @@ function App() {
     if (!user) return "/";
     switch (user.role) {
       case "respondent":
-        return "/ranking-exercise";
+        return "/round-1-results";
       case "manager":
         return "/database-management";
       case "admin":
@@ -92,6 +93,17 @@ function App() {
               <ProtectedRoute allowedRoles={['respondent']}>
                 <DashboardLayout>
                   <RankingExercise />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/round-1-results"
+            element={
+              <ProtectedRoute allowedRoles={['respondent']}>
+                <DashboardLayout>
+                  <RespondentRound1ResultsPage />
                 </DashboardLayout>
               </ProtectedRoute>
             }

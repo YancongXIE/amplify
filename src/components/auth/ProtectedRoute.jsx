@@ -17,11 +17,11 @@ const ProtectedRoute = ({ children, allowedRoles = ['manager', 'admin', 'respond
   // 如果是respondent用户，限制访问
   if (userRole === 'respondent') {
     // respondent用户只能访问这些路径
-    const allowedPaths = ['/ranking-exercise', '/guide'];
+    const allowedPaths = ['/ranking-exercise', '/round-1-results', '/guide'];
     
     // 如果访问的不是允许的路径，重定向到ranking exercise
     if (!allowedPaths.includes(currentPath)) {
-      return <Navigate to="/ranking-exercise" replace />;
+      return <Navigate to="/round-1-results" replace />;
     }
   }
 

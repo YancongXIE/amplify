@@ -22,10 +22,13 @@ export function AuthProvider({ children }) {
     if (token) {
       const cachedUser = localStorage.getItem("userData");
       if (cachedUser) {
-        setUser(JSON.parse(cachedUser));
-        setIsLoggedIn(true);
-        setIsAuthChecked(true);
-        return;
+        const parsed = JSON.parse(cachedUser);
+        if (parsed.id != null) {
+          setUser(parsed);
+          setIsLoggedIn(true);
+          setIsAuthChecked(true);
+          return;
+        }
       }
 
       try {

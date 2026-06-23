@@ -120,36 +120,69 @@ export const factorInterpretations = [
 ];
 
 export const respondentFactors = [
-  { label: "Participant 01", factor: 1 },
-  { label: "Participant 02", factor: 1 },
-  { label: "Participant 03", factor: 3 },
-  { label: "Participant 04", factor: 4 },
-  { label: "Participant 05", factor: 1 },
-  { label: "Participant 06", factor: 1 },
-  { label: "Participant 07", factor: 2 },
-  { label: "Participant 08", factor: 1 },
-  { label: "Participant 09", factor: 2 },
-  { label: "Participant 10", factor: 3 },
-  { label: "Participant 11", factor: null },
-  { label: "Participant 12", factor: 5 },
-  { label: "Participant 13", factor: 5 },
-  { label: "Participant 14", factor: 2 },
-  { label: "Participant 15", factor: 1 },
-  { label: "Participant 16", factor: 1 },
-  { label: "Participant 17", factor: 5 },
-  { label: "Participant 18", factor: 4 },
-  { label: "Participant 19", factor: 4 },
-  { label: "Participant 20", factor: 2 },
-  { label: "Participant 21", factor: null },
-  { label: "Participant 22", factor: 2 },
-  { label: "Participant 23", factor: null },
-  { label: "Participant 24", factor: 3 },
-  { label: "Participant 25", factor: 3 },
-  { label: "Participant 26", factor: 3 },
-  { label: "Participant 27", factor: 5 },
-  { label: "Participant 28", factor: 3 },
-  { label: "Participant 29", factor: null },
-  { label: "Participant 30", factor: 4 },
-  { label: "Participant 31", factor: 4 },
-  { label: "Participant 32", factor: 2 },
+  { label: "Participant 01", respondentId: 27, factor: 1 },
+  { label: "Participant 02", respondentId: 30, factor: 1 },
+  { label: "Participant 03", respondentId: 33, factor: 3 },
+  { label: "Participant 04", respondentId: 34, factor: 4 },
+  { label: "Participant 05", respondentId: 35, factor: 1 },
+  { label: "Participant 06", respondentId: 36, factor: 1 },
+  { label: "Participant 07", respondentId: 37, factor: 2 },
+  { label: "Participant 08", respondentId: 39, factor: 1 },
+  { label: "Participant 09", respondentId: 40, factor: 2 },
+  { label: "Participant 10", respondentId: 43, factor: 3 },
+  { label: "Participant 11", respondentId: 44, factor: null },
+  { label: "Participant 12", respondentId: 45, factor: 5 },
+  { label: "Participant 13", respondentId: 46, factor: 5 },
+  { label: "Participant 14", respondentId: 47, factor: 2 },
+  { label: "Participant 15", respondentId: 49, factor: 1 },
+  { label: "Participant 16", respondentId: 50, factor: 1 },
+  { label: "Participant 17", respondentId: 51, factor: 5 },
+  { label: "Participant 18", respondentId: 52, factor: 4 },
+  { label: "Participant 19", respondentId: 54, factor: 4 },
+  { label: "Participant 20", respondentId: 56, factor: 2 },
+  { label: "Participant 21", respondentId: 58, factor: null },
+  { label: "Participant 22", respondentId: 59, factor: 2 },
+  { label: "Participant 23", respondentId: 60, factor: null },
+  { label: "Participant 24", respondentId: 61, factor: 3 },
+  { label: "Participant 25", respondentId: 62, factor: 3 },
+  { label: "Participant 26", respondentId: 63, factor: 3 },
+  { label: "Participant 27", respondentId: 64, factor: 5 },
+  { label: "Participant 28", respondentId: 68, factor: 3 },
+  { label: "Participant 29", respondentId: 72, factor: null },
+  { label: "Participant 30", respondentId: 96, factor: 4 },
+  { label: "Participant 31", respondentId: 98, factor: 4 },
+  { label: "Participant 32", respondentId: 99, factor: 2 },
 ];
+
+export function getParticipantByRespondentId(respondentId, username) {
+  if (respondentId != null) {
+    const direct = respondentFactors.find(
+      (entry) => String(entry.respondentId) === String(respondentId)
+    );
+    if (direct) {
+      return { ...direct, currentRespondentId: respondentId };
+    }
+  }
+
+  // Bulk-created accounts often have a different DB id than the analysis export id.
+  // Match by username suffix, e.g. SaudiCIS_respondent_1780398542716_99 -> analysis id 99.
+  if (username) {
+    const suffixMatch = username.match(/_(\d+)$/);
+    if (suffixMatch) {
+      const analysisRespondentId = suffixMatch[1];
+      const bySuffix = respondentFactors.find(
+        (entry) => String(entry.respondentId) === analysisRespondentId
+      );
+      if (bySuffix) {
+        return { ...bySuffix, currentRespondentId: respondentId };
+      }
+    }
+  }
+
+  return null;
+}
+
+export function getFactorInterpretation(factor) {
+  if (!factor) return null;
+  return factorInterpretations.find((entry) => entry.factor === factor) ?? null;
+}

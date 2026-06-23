@@ -87,6 +87,18 @@ const Login = ({ userType, toggle }) => {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("userType", userType);
+      if (userType === "respondent" && data.user) {
+        localStorage.setItem(
+          "userData",
+          JSON.stringify({
+            id: data.user.id,
+            username: data.user.username,
+            role: "respondent",
+            studyId: data.user.studyId,
+            adminID: data.user.adminID,
+          })
+        );
+      }
       setIsLoggedIn(true);
       await fetchUserData();
       setError(null);
@@ -97,7 +109,7 @@ const Login = ({ userType, toggle }) => {
       setIsLoading(false);
       setTimeout(() => {
         document.getElementById(`${userType}_login_modal`).close();
-        navigate("/dataanalyst");
+        navigate(userType === "respondent" ? "/round-1-results" : "/study-configuration");
         setSuccess(null);
         setIsLoading(false);
       }, 2000);

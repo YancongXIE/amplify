@@ -32,6 +32,7 @@ export default function DashboardSidebar({ isCollapsed }) {
   const adminMenuItems = adminItems;
 
   const respondentItems = [
+    { href: "/round-1-results", label: "Round 1 Results", icon: <Icons.ChartBar /> },
     { href: "/ranking-exercise", label: "Ranking Exercise", icon: <Icons.CPUChip/> },
     { href: "/guide", label: "Guide", icon: <Icons.InfoIcon /> },
   ];
