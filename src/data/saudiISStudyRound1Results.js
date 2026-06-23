@@ -155,17 +155,9 @@ export const respondentFactors = [
 ];
 
 export function getParticipantByRespondentId(respondentId, username) {
-  if (respondentId != null) {
-    const direct = respondentFactors.find(
-      (entry) => String(entry.respondentId) === String(respondentId)
-    );
-    if (direct) {
-      return { ...direct, currentRespondentId: respondentId };
-    }
-  }
-
-  // Bulk-created accounts often have a different DB id than the analysis export id.
-  // Match by username suffix, e.g. SaudiCIS_respondent_1780398542716_99 -> analysis id 99.
+  // Bulk-created accounts use a username suffix that maps to the analysis export id,
+  // e.g. SaudiCIS_respondent_1780398542716_99 -> analysis respondent id 99.
+  // Do not match by database respondentID alone — ids can collide across systems.
   if (username) {
     const suffixMatch = username.match(/_(\d+)$/);
     if (suffixMatch) {

@@ -18,10 +18,10 @@ export default function RespondentRound1ResultsPage() {
     return slots.length === 5 && slots.every((n) => !Number.isNaN(n)) ? slots : null;
   }, [distribution]);
 
-  const participant = useMemo(
-    () => getParticipantByRespondentId(user?.id, user?.username),
-    [user?.id, user?.username]
-  );
+  const participant = useMemo(() => {
+    if (qSortLoading || !qSortItems?.length) return null;
+    return getParticipantByRespondentId(user?.id, user?.username);
+  }, [user?.id, user?.username, qSortItems, qSortLoading]);
 
   const sortingData = useMemo(() => {
     if (!qSortItems?.length) return [];

@@ -90,8 +90,7 @@ export default function PersonalSortingVisualization({
   if (!sortingData?.length) {
     return (
       <div className="rounded-xl border border-base-300 bg-base-100 p-6 text-secondary-content">
-        No Round 1 ranking was found for your account yet. Once you submit your ranking, your
-        personal chart will appear here.
+        No Round 1 ranking was found for your account yet.
       </div>
     );
   }

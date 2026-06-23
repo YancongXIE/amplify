@@ -93,7 +93,8 @@ export default function SaudiISStudyRound1ResultsContent({
   sortingDistribution = null,
 }) {
   const isPersonal = variant === "personal";
-  const userFactor = participant?.factor ?? null;
+  const hasSubmittedRanking = isPersonal && !sortingLoading && sortingData.length > 0;
+  const userFactor = hasSubmittedRanking ? (participant?.factor ?? null) : null;
   const userFactorKey = userFactor ? `f${userFactor}` : null;
   const factorInfo = getFactorInterpretation(userFactor);
 
@@ -144,7 +145,7 @@ export default function SaudiISStudyRound1ResultsContent({
               <p className="text-sm font-semibold uppercase tracking-wide text-primary mb-2">
                 Your position in the panel
               </p>
-              {userFactor ? (
+              {hasSubmittedRanking && userFactor ? (
                 <>
                   <h2 className="text-2xl font-bold text-secondary-content mb-2">
                     School of Thought {userFactor}: {factorInfo?.interpretation}
@@ -155,16 +156,22 @@ export default function SaudiISStudyRound1ResultsContent({
                     other experts who share a similar perspective.
                   </p>
                 </>
-              ) : (
+              ) : hasSubmittedRanking ? (
                 <p className="text-secondary-content/90 leading-relaxed">
                   Your ranking did not load strongly onto a single School of Thought in Round 1.
                   That can happen when your priorities blend several perspectives. The full panel
                   results below still show where the broader group converged and diverged.
                 </p>
+              ) : (
+                <p className="text-secondary-content/90 leading-relaxed">
+                  You have not submitted a Round 1 ranking yet. However, you can review round 1
+                  results and choose to participate in the next round.
+                </p>
               )}
               <p className="text-sm text-secondary-content/70">
-                Sections highlighted below are connected to your submission. Other participants
-                remain anonymous.
+                {hasSubmittedRanking
+                  ? "Sections highlighted below are connected to your submission. Other participants remain anonymous."
+                  : "The panel results below are available to review now. Complete the ranking exercise when you are ready to add your own priorities."}
               </p>
             </div>
 
