@@ -14,6 +14,7 @@ import DashboardLayout from "./components/layout/DashboardLayout";
 // public pages imports:
 import LandingPage from "./pages/public-pages/LandingPage";
 import SaudiISStudyPage from "./pages/public-pages/SaudiISStudyPage";
+import SaudiISStudyRound1ResultsPage from "./pages/public-pages/SaudiISStudyRound1ResultsPage";
 // private (dashboard) page imports:
 import DashboardHome from "./pages/data-vis-pages/DashboardHome";
 import DataAnalyst from "./pages/data-vis-pages/DataAnalyst";
@@ -61,6 +62,15 @@ function App() {
             element={
               <PublicLayout>
                 <SaudiISStudyPage />
+              </PublicLayout>
+            }
+          />
+
+          <Route
+            path="/projects/saudi-is-study/round-1-results"
+            element={
+              <PublicLayout>
+                <SaudiISStudyRound1ResultsPage />
               </PublicLayout>
             }
           />

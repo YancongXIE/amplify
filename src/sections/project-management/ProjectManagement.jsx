@@ -415,7 +415,7 @@ const DataTable = ({ data, columns, onEdit, onDelete, onAdd, parentData = null, 
           </TableHead>
           <TableBody>
             {filteredData.map((item) => (
-              <TableRow key={item[columns[0].field]}>
+              <TableRow key={item.rowKey || item[columns[0].field]}>
                 {columns.map((column) => (
                   <TableCell key={column.field}>
                     {column.render ? column.render(item) : item[column.field]}
@@ -1427,67 +1427,65 @@ export default function ProjectManagement() {
     }
   };
 
-  // Add new data processing function in ProjectManagement component
+  // Build Q-Sort pivot table from qSortData directly so results remain visible
+  // even when studyStatementData is scoped by role (e.g. admin vs manager).
   const processQSortData = () => {
-    // Get all unique respondents who have submitted Q-Sort data
-    const respondentsWithData = [...new Set(qSortData.map(item => item.respondentID))];
-    
-    // Get all unique statements for the selected study
-    const uniqueStatements = selectedStudyForQSort
-      ? [...new Set(studyStatementData
-          .filter(s => s.studyID === parseInt(selectedStudyForQSort))
-          .map(s => {
-            const statement = statementData.find(st => st.statementID === s.statementID);
-            return statement ? statement.statementID : null;
-          }))]
-          .filter(Boolean)
-      : [...new Set(qSortData.map(item => {
-          const studyStatement = studyStatementData.find(s => s.studyStatementID === item.studyStatementID);
-          if (studyStatement) {
-            const statement = statementData.find(s => s.statementID === studyStatement.statementID);
-            return statement ? statement.statementID : null;
-          }
-          return null;
-        }))]
-        .filter(Boolean);
+    const relevantQSortItems = selectedStudyForQSort
+      ? qSortData.filter(item => {
+          const respondent = respondentData.find(r => r.respondentID === item.respondentID);
+          return respondent?.studyID === parseInt(selectedStudyForQSort);
+        })
+      : qSortData;
 
-    // Filter respondents by selected study if a study is selected
-    const filteredRespondents = selectedStudyForQSort
-      ? respondentData.filter(r => 
-          r.studyID === parseInt(selectedStudyForQSort) && 
-          respondentsWithData.includes(r.respondentID)
-        )
-      : respondentData.filter(r => respondentsWithData.includes(r.respondentID));
+    const statementColumns = [...new Map(
+      relevantQSortItems.map(item => {
+        const studyStatement = studyStatementData.find(
+          s => s.studyStatementID === item.studyStatementID
+        );
+        const statement = studyStatement
+          ? statementData.find(s => s.statementID === studyStatement.statementID)
+          : null;
+        const label = statement?.short || `Statement ${item.studyStatementID}`;
+        return [item.studyStatementID, { studyStatementID: item.studyStatementID, label }];
+      })
+    ).values()];
 
-    // Create new data structure
-    return filteredRespondents.map(respondent => {
+    const respondentRoundPairs = [...new Map(
+      relevantQSortItems.map(item => [
+        `${item.respondentID}-${item.roundID}`,
+        { respondentID: item.respondentID, roundID: item.roundID }
+      ])
+    ).values()];
+
+    const rows = respondentRoundPairs.map(({ respondentID, roundID }) => {
+      const respondent = respondentData.find(r => r.respondentID === respondentID);
+      const studyRound = studyRoundData.find(r => r.roundID === roundID);
+
       const rowData = {
-        respondentID: respondent.respondentID,
-        username: respondent.username,
+        respondentID,
+        roundID,
+        rowKey: `${respondentID}-${roundID}`,
+        username: respondent ? respondent.username : 'Unknown',
+        studyRound: studyRound ? studyRound.studyRound : '-',
         statements: {}
       };
 
-      // Add Q-Sort value for each statement
-      uniqueStatements.forEach(statementId => {
-        const studyStatement = studyStatementData.find(s => 
-          s.statementID === statementId && 
-          (!selectedStudyForQSort || s.studyID === parseInt(selectedStudyForQSort))
+      statementColumns.forEach(({ studyStatementID, label }) => {
+        const qSortItem = relevantQSortItems.find(q =>
+          q.respondentID === respondentID &&
+          q.studyStatementID === studyStatementID &&
+          q.roundID === roundID
         );
-        if (studyStatement) {
-          const qSortItem = qSortData.find(q => 
-            q.respondentID === respondent.respondentID && 
-            q.studyStatementID === studyStatement.studyStatementID
-          );
-          const statement = statementData.find(s => s.statementID === statementId);
-          if (statement) {
-            rowData.statements[statement.short] = qSortItem ? qSortItem.qSortValue : null;
-          }
-        }
+        rowData.statements[label] = qSortItem ? qSortItem.qSortValue : null;
       });
 
       return rowData;
     });
+
+    return { rows, statementColumns };
   };
+
+  const qSortTableData = processQSortData();
 
   return (
     <Box sx={{ 
@@ -1613,18 +1611,23 @@ export default function ProjectManagement() {
           )}
           {currentTab === 6 && (
             <DataTable
-              data={processQSortData()}
+              data={qSortTableData.rows}
               columns={[
                 { 
                   field: 'username', 
                   label: 'Respondent',
                   render: (item) => item.username
                 },
-                ...Object.keys(processQSortData()[0]?.statements || {}).map(statement => ({
-                  field: `statements.${statement}`,
-                  label: statement,
+                {
+                  field: 'studyRound',
+                  label: 'Study Round',
+                  render: (item) => item.studyRound
+                },
+                ...qSortTableData.statementColumns.map(({ label }) => ({
+                  field: `statements.${label}`,
+                  label,
                   render: (item) => {
-                    const value = item.statements[statement];
+                    const value = item.statements[label];
                     return value === null || value === undefined ? '-' : value;
                   }
                 })),
@@ -1635,8 +1638,10 @@ export default function ProjectManagement() {
                     <Box>
                       <IconButton 
                         onClick={() => {
-                          // Find all Q-Sort data for this respondent
-                          const qSortItems = qSortData.filter(q => q.respondentID === item.respondentID);
+                          // Find all Q-Sort data for this respondent and study round
+                          const qSortItems = qSortData.filter(q => 
+                            q.respondentID === item.respondentID && q.roundID === item.roundID
+                          );
                           
                           // Log
                           console.log('Q-Sort data to be deleted:', {

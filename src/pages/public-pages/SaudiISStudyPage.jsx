@@ -32,6 +32,32 @@ export default function SaudiISStudyPage() {
           </h1>
         </header>
 
+        <section className="mb-12">
+          <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-base-100 to-base-100 p-6 lg:p-8 shadow-sm">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div className="flex-1">
+                <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-3">
+                  Round 1 complete
+                </div>
+                <h2 className="text-xl font-semibold text-secondary-content mb-2">
+                  Data collection round 1 results
+                </h2>
+                <p className="text-secondary-content/80 leading-relaxed max-w-2xl">
+                  View the preliminary findings from the first ranking round, including
+                  five Schools of Thought, factor loadings, distinguishing statements,
+                  and scores across all 18 key issues.
+                </p>
+              </div>
+              <Link
+                to="/projects/saudi-is-study/round-1-results"
+                className="btn btn-primary shrink-0"
+              >
+                View round 1 results
+              </Link>
+            </div>
+          </div>
+        </section>
+
         <Section title="About this study">
           <p>
             Saudi Arabia&apos;s information systems landscape has changed
