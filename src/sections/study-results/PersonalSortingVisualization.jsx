@@ -65,6 +65,7 @@ export default function PersonalSortingVisualization({
   loading,
   error,
   distribution: distributionProp,
+  description,
 }) {
   if (loading) {
     return (
@@ -104,8 +105,8 @@ export default function PersonalSortingVisualization({
   return (
     <div className="rounded-xl border border-base-300 bg-base-100 p-4 lg:p-6 shadow-sm">
       <p className="text-sm text-secondary-content/80 mb-6 text-center max-w-2xl mx-auto">
-        Your ranked result is shown below. Each box shows where you placed one of the 18 issues
-        on the −2 to +2 scale.
+        {description ??
+          "Your ranked result is shown below. Each box shows where you placed one of the 18 issues on the −2 to +2 scale."}
       </p>
 
       <div className="overflow-x-auto pb-2">

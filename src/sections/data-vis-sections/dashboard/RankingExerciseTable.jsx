@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useExerciseStatements } from "../../../api/hooks/useExerciseStatements";
 import { useRespondentDistribution } from "../../../api/hooks/useRespondentDistribution";
+import { useRespondentQSort } from "../../../api/hooks/useRespondentQSort";
 import { useSubmitQSort } from "../../../api/hooks/useSubmitQSort";
+import PersonalSortingVisualization from "../../study-results/PersonalSortingVisualization";
 
 export default function RankingExerciseTable() {
   const { loading, data, error } = useExerciseStatements();
   const { distribution, distributionLoading, distributionError } = useRespondentDistribution();
+  const { data: qSortItems, loading: qSortLoading } = useRespondentQSort();
   const { submitQSort, submitLoading, submitError } = useSubmitQSort();
   const [selectedValues, setSelectedValues] = useState({});
   const [distributionArray, setDistributionArray] = useState([]);
@@ -18,6 +21,41 @@ export default function RankingExerciseTable() {
   });
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  const distributionSlots = useMemo(() => {
+    if (!distribution) return null;
+    const slots = distribution.split(",").map((value) => parseInt(value, 10));
+    return slots.length === 5 && slots.every((n) => !Number.isNaN(n)) ? slots : null;
+  }, [distribution]);
+
+  const previousSortingData = useMemo(() => {
+    if (!qSortItems?.length || !data) return [];
+
+    return qSortItems
+      .map((item) => {
+        const statement = data.find(
+          (entry) =>
+            entry.statementID === item.statementID ||
+            entry.statementID === item.statementId
+        );
+
+        const short = item.short || statement?.short;
+        const statementText = item.statementText || statement?.statementText;
+        const qSortValue = item.qSortValue;
+
+        if (short == null || qSortValue == null) return null;
+
+        return {
+          statementID: item.statementID ?? item.statementId ?? statement?.statementID,
+          short,
+          statementText,
+          qSortValue,
+        };
+      })
+      .filter(Boolean);
+  }, [qSortItems, data]);
+
+  const hasPreviousRanking = previousSortingData.length > 0;
+
   // Convert distribution string to array
   useEffect(() => {
     if (distribution) {
@@ -26,7 +64,7 @@ export default function RankingExerciseTable() {
     }
   }, [distribution]);
 
-  // Initialize selectedValues once data is loaded
+  // Initialize ranking table to neutral (0) — previous ranking is shown separately above
   useEffect(() => {
     if (data && Object.keys(selectedValues).length === 0) {
       const initialSelectedValues = data.reduce((acc, { statementID }) => {
@@ -76,14 +114,14 @@ export default function RankingExerciseTable() {
   };
 
   const handleReset = () => {
-    if (data) {
-      setSelectedValues(
-        data.reduce((acc, { statementID }) => {
-          acc[statementID] = 0;
-          return acc;
-        }, {})
-      );
-    }
+    if (!data) return;
+
+    setSelectedValues(
+      data.reduce((acc, { statementID }) => {
+        acc[statementID] = 0;
+        return acc;
+      }, {})
+    );
   };
 
   const isValid = data && Object.values(warnings).every(w => w === "");
@@ -108,6 +146,30 @@ export default function RankingExerciseTable() {
   } else {
     content = (
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "20px" }}>
+        {(qSortLoading || hasPreviousRanking) && (
+          <div
+            style={{
+              width: "80%",
+              marginBottom: "24px",
+            }}
+          >
+            <div style={{ marginBottom: "16px", textAlign: "center" }}>
+              <h3 style={{ color: "#2452b5", fontWeight: "bold", marginBottom: "8px" }}>
+                Your previous ranking
+              </h3>
+              <p style={{ color: "#666", fontStyle: "italic" }}>
+                Use this as a reference while completing your new ranking below.
+              </p>
+            </div>
+            <PersonalSortingVisualization
+              sortingData={previousSortingData}
+              loading={qSortLoading}
+              distribution={distributionSlots}
+              description="Your previous ranking is shown below. Each box shows where you placed one of the 18 issues on the −2 to +2 scale."
+            />
+          </div>
+        )}
+
         {/* Reset Button */}
         <div style={{ width: "80%", display: "flex", justifyContent: "flex-end", marginBottom: "10px" }}>
           <button

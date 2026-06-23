@@ -6,7 +6,6 @@ import {
   factorLoadingsTotal,
   statementFactorScores,
   factorInterpretations,
-  respondentFactors,
   getFactorInterpretation,
 } from "../../data/saudiISStudyRound1Results";
 import PersonalSortingVisualization from "./PersonalSortingVisualization";
@@ -332,6 +331,7 @@ export default function SaudiISStudyRound1ResultsContent({
           />
         </section>
 
+        {/* Factor (School of Thought) by respondent — hidden for now
         <section className="mb-12">
           <SectionHeading highlight={isPersonal}>
             Factor (School of Thought) by respondent
@@ -401,6 +401,7 @@ export default function SaudiISStudyRound1ResultsContent({
             </table>
           </div>
         </section>
+        */}
 
         <section className="mb-8">
           <SectionHeading>Scores for each key issue</SectionHeading>
